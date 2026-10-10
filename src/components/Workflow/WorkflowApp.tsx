@@ -42,6 +42,13 @@ export const WorkflowApp: React.FC<WorkflowAppProps> = ({
     return initialLanguage;
   });
 
+  // Sync state when initialLanguage changes externally (e.g., from Header language selector)
+  useEffect(() => {
+    if (initialLanguage && initialLanguage !== selectedLanguage) {
+      setSelectedLanguage(initialLanguage);
+    }
+  }, [initialLanguage]);
+
   // Analysis Result & Progress State
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -293,7 +300,12 @@ export const WorkflowApp: React.FC<WorkflowAppProps> = ({
 
       {/* Screen 1: Landing Page */}
       {currentStep === 'landing' && (
-        <LandingScreen onGetStarted={handleGetStarted} />
+        <LandingScreen 
+          onGetStarted={handleGetStarted}
+          currentLanguage={selectedLanguage}
+          onLanguageChange={handleLanguageChange}
+          onSelectCategory={handleSelectCategory}
+        />
       )}
 
       {/* Screen 2: Choose Document Type */}
@@ -301,6 +313,7 @@ export const WorkflowApp: React.FC<WorkflowAppProps> = ({
         <DocumentTypeScreen
           onSelectCategory={handleSelectCategory}
           onBack={() => setCurrentStep('landing')}
+          currentLanguage={selectedLanguage}
         />
       )}
 
@@ -311,6 +324,7 @@ export const WorkflowApp: React.FC<WorkflowAppProps> = ({
           existingFile={uploadedFile}
           onFileConfirmed={handleFileConfirmed}
           onBack={() => setCurrentStep('selection')}
+          currentLanguage={selectedLanguage}
         />
       )}
 

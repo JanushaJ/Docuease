@@ -2,12 +2,15 @@ import React from 'react';
 import { ArrowLeft, ArrowRight, Stethoscope, FileText, CheckCircle2 } from 'lucide-react';
 import { PrescriptionIllustration } from '../Illustrations/PrescriptionIllustration';
 import { ComplexDocIllustration } from '../Illustrations/ComplexDocIllustration';
+import { SupportedLanguage } from '../../types/medscript';
+import { getUITranslation } from '../../utils/uiTranslations';
 
 export type DocumentCategory = 'prescription' | 'complex_document';
 
 export interface DocumentTypeScreenProps {
   onSelectCategory: (category: DocumentCategory) => void;
   onBack: () => void;
+  currentLanguage?: SupportedLanguage;
 }
 
 /**
@@ -19,7 +22,10 @@ export interface DocumentTypeScreenProps {
 export const DocumentTypeScreen: React.FC<DocumentTypeScreenProps> = ({
   onSelectCategory,
   onBack,
+  currentLanguage = 'en',
 }) => {
+  const t = getUITranslation(currentLanguage);
+
   return (
     <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       
@@ -68,28 +74,28 @@ export const DocumentTypeScreen: React.FC<DocumentTypeScreenProps> = ({
                 <span className="text-xs font-bold uppercase tracking-wider text-teal-700">Clinical Engine</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                Medical Handwritten Prescription
+                {t.cardATitle}
               </h3>
             </div>
 
             {/* Description */}
             <p className="text-slate-600 text-sm leading-relaxed">
-              Understand handwritten prescriptions, medicines, and dosage instructions.
+              {t.cardASubtitle}
             </p>
 
             {/* Specific Capabilities List */}
             <div className="space-y-2 pt-1 border-t border-slate-100 text-xs text-slate-600">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
-                <span>Deciphers cursive handwriting & doctor shorthand</span>
+                <span>{t.cardAPoint1}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
-                <span>Extracts dosage patterns (1-0-1), duration & timing</span>
+                <span>{t.cardAPoint2}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
-                <span>Flags ambiguous names for pharmacist verification</span>
+                <span>{t.cardAPoint3}</span>
               </div>
             </div>
           </div>
@@ -101,7 +107,7 @@ export const DocumentTypeScreen: React.FC<DocumentTypeScreenProps> = ({
               className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-sm shadow-sm hover:shadow transition-all group-hover:bg-teal-800 focus:outline-none focus:ring-4 focus:ring-teal-500/20"
               aria-label="Upload Prescription"
             >
-              <span>Upload Prescription</span>
+              <span>{t.cardABtn}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -124,28 +130,28 @@ export const DocumentTypeScreen: React.FC<DocumentTypeScreenProps> = ({
                 <span className="text-xs font-bold uppercase tracking-wider text-sky-700">Simplification Engine</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                Complex Documents in Simple Language
+                {t.cardBTitle}
               </h3>
             </div>
 
             {/* Description */}
             <p className="text-slate-600 text-sm leading-relaxed">
-              Simplify complicated documents into clear, easy-to-understand text.
+              {t.cardBSubtitle}
             </p>
 
             {/* Specific Capabilities List */}
             <div className="space-y-2 pt-1 border-t border-slate-100 text-xs text-slate-600">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-sky-600 shrink-0" />
-                <span>Electricity, water, gas & utility bills</span>
+                <span>{t.cardBPoint1}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-sky-600 shrink-0" />
-                <span>Bank letters, KYC reminders & government circulars</span>
+                <span>{t.cardBPoint2}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-sky-600 shrink-0" />
-                <span>Highlights amounts due, deadlines & scam warnings</span>
+                <span>{t.cardBPoint3}</span>
               </div>
             </div>
           </div>
@@ -157,7 +163,7 @@ export const DocumentTypeScreen: React.FC<DocumentTypeScreenProps> = ({
               className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-sky-700 hover:bg-sky-800 text-white font-bold text-sm shadow-sm hover:shadow transition-all group-hover:bg-sky-800 focus:outline-none focus:ring-4 focus:ring-sky-500/20"
               aria-label="Upload Document"
             >
-              <span>Upload Document</span>
+              <span>{t.cardBBtn}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

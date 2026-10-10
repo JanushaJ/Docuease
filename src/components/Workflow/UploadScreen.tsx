@@ -16,6 +16,8 @@ import {
 import { DocumentCategory } from './DocumentTypeScreen';
 import { getPrescriptionDemoDocument } from '../../data/medscriptDemos';
 import { getHepatitisDocument } from '../../data/hepatitisDemo';
+import { SupportedLanguage } from '../../types/medscript';
+import { getUITranslation } from '../../utils/uiTranslations';
 
 export interface UploadedFileData {
   name: string;
@@ -31,6 +33,7 @@ export interface UploadScreenProps {
   existingFile: UploadedFileData | null;
   onFileConfirmed: (fileData: UploadedFileData) => void;
   onBack: () => void;
+  currentLanguage?: SupportedLanguage;
 }
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
@@ -46,6 +49,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
   existingFile,
   onFileConfirmed,
   onBack,
+  currentLanguage = 'en',
 }) => {
   const [selectedFile, setSelectedFile] = useState<UploadedFileData | null>(existingFile);
   const [isDragging, setIsDragging] = useState(false);
@@ -55,13 +59,14 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
+  const t = getUITranslation(currentLanguage);
   const isPrescription = category === 'prescription';
   const headingTitle = isPrescription 
-    ? 'Upload Medical Handwritten Prescription'
-    : 'Upload Complex Document';
+    ? t.cardATitle || 'Upload Medical Handwritten Prescription'
+    : t.cardBTitle || 'Upload Complex Document';
   const headingSubtitle = isPrescription
-    ? 'Upload a clear photo or scan of your handwritten doctor prescription, clinical note, or lab report.'
-    : 'Upload your utility bill (electricity, water, gas), bank letter, or official government notice.';
+    ? t.cardASubtitle || 'Upload a clear photo or scan of your handwritten doctor prescription, clinical note, or lab report.'
+    : t.cardBSubtitle || 'Upload your utility bill (electricity, water, gas), bank letter, or official government notice.';
 
   // Handle actual file object — ZERO REJECTION POLICY: Accept any document or photo
   const processFile = useCallback((file: File) => {

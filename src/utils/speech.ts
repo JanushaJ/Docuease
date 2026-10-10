@@ -138,9 +138,9 @@ class SpeechManager {
       }) || null;
     }
 
-    // For English or languages with verified browser voice, use speech synthesis
-    // For regional languages where Windows/Chrome lacks local voice packs, use high-fidelity natural TTS audio
-    const shouldUseAudioStream = !matchedVoice || (this.language !== 'en' && !matchedVoice.lang.toLowerCase().startsWith(langPrefix));
+    // For all regional languages, ALWAYS use Google Translate high-fidelity TTS audio stream
+    // Speech synthesis is only used for English with a verified voice, or as secondary fallback
+    const shouldUseAudioStream = this.language !== 'en' || !matchedVoice;
 
     if (shouldUseAudioStream) {
       this.playViaAudioStream(item.sentence, this.language);
@@ -151,27 +151,59 @@ class SpeechManager {
 
   private playViaAudioStream(text: string, lang: SupportedLanguage) {
     try {
-      const audioUrl = `/api/tts?text=${encodeURIComponent(text.slice(0, 250))}&lang=${lang}`;
-      const audio = new Audio(audioUrl);
+      const primaryAudioUrl = `/api/tts?text=${encodeURIComponent(text.slice(0, 250))}&lang=${lang}`;
+      const audio = new Audio(primaryAudioUrl);
       this.currentAudio = audio;
       audio.playbackRate = this.rate;
+
+      // Dispatch event for 3D mascot reaction
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('docubot:speaking', { detail: { isSpeaking: true, text, lang } }));
+      }
 
       audio.onplay = () => {
         this.isSpeaking = true;
         this.isPaused = false;
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('docubot:speaking', { detail: { isSpeaking: true, text, lang } }));
+        }
       };
 
       audio.onended = () => {
         this.currentAudio = null;
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('docubot:speaking', { detail: { isSpeaking: false } }));
+        }
         this.currentSentenceIndex++;
         this.playNextSentence();
       };
 
       audio.onerror = (e) => {
-        console.warn(`[Audio stream error for lang=${lang}, advancing]:`, e);
-        this.currentAudio = null;
-        this.currentSentenceIndex++;
-        this.playNextSentence();
+        console.warn(`[Primary TTS audio error for lang=${lang}, trying direct fallback]:`, e);
+        // Direct client fallback to Google Translate TTS
+        const fallbackUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${encodeURIComponent(lang)}&q=${encodeURIComponent(text.slice(0, 200))}`;
+        const fallbackAudio = new Audio(fallbackUrl);
+        this.currentAudio = fallbackAudio;
+        fallbackAudio.playbackRate = this.rate;
+
+        fallbackAudio.onended = () => {
+          this.currentAudio = null;
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('docubot:speaking', { detail: { isSpeaking: false } }));
+          }
+          this.currentSentenceIndex++;
+          this.playNextSentence();
+        };
+
+        fallbackAudio.onerror = () => {
+          console.warn('[Fallback Google TTS also failed, trying local synthesis]');
+          this.currentAudio = null;
+          this.playViaSpeechSynthesis(text, BCP47_LANG_MAP[lang] || 'en-US', null);
+        };
+
+        fallbackAudio.play().catch(() => {
+          this.playViaSpeechSynthesis(text, BCP47_LANG_MAP[lang] || 'en-US', null);
+        });
       };
 
       audio.play().catch((err) => {
@@ -246,8 +278,11 @@ class SpeechManager {
       this.currentAudio.pause();
       this.currentAudio = null;
     }
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('docubot:speaking', { detail: { isSpeaking: false } }));
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
     }
     this.isSpeaking = false;
     this.isPaused = false;
