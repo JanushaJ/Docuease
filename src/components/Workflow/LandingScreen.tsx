@@ -398,14 +398,15 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
 
         <div className="max-w-[1240px] mx-auto w-full">
 
-          {/* DESKTOP / TABLET HERO COVER CANVAS (High-Fidelity Widescreen Scene with Live Working Controls) */}
-          <div className="hidden md:block relative w-full rounded-3xl overflow-hidden shadow-2xl shadow-sky-900/10 border border-sky-100 bg-[#eaf4fd]">
+          {/* HERO COVER CANVAS: Exact Grandmother Scene with Live Working Controls (Always Visible Everywhere) */}
+          <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl sm:shadow-2xl shadow-sky-900/10 border border-sky-100 bg-[#eaf4fd]">
             
-            {/* The Visual Scene Artwork */}
+            {/* The Visual Scene Artwork (Eager Loaded) */}
             <img 
-              src="/cover_hero_scene.jpg" 
+              src="/grandmother_cover.jpg" 
               alt="DocuEase Cover: From Confusing Documents to Clear Understanding"
               className="w-full h-auto object-cover select-none pointer-events-none block"
+              loading="eager"
             />
 
             {/* LIVE WORKING HOTSPOT: Try Now Button (Matches Reference Coordinates) */}
@@ -561,135 +562,6 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
               className="absolute left-[62.5%] top-[74%] w-[14.5%] h-[24%] rounded-2xl cursor-pointer hover:bg-sky-500/10 transition-colors z-20"
               title="From local to global, we've got you covered"
             />
-
-          </div>
-
-          {/* MOBILE HERO COVER SECTION (Responsive Fallback for Phones) */}
-          <div className="md:hidden flex flex-col space-y-6 pt-4">
-            
-            {/* Mobile Header & Text */}
-            <div className="text-left space-y-3">
-              <span className="inline-block px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-[11px] font-bold">
-                ✨ Documents Made Simple
-              </span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                From Confusing Documents to Clear Understanding
-              </h1>
-              <p className="text-slate-600 text-sm leading-relaxed">
-                Upload. Translate. Understand. AI turns complex documents into simple language — in the language you choose.
-              </p>
-              <div className="pt-2">
-                <button
-                  onClick={onGetStarted}
-                  className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] text-white font-bold text-sm shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2"
-                >
-                  <span>Try Now</span>
-                  <span>→</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Grandma & Little Girl Speech Bubbles */}
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-3 bg-purple-50/80 rounded-2xl border border-purple-200 text-purple-900">
-                <p className="font-bold text-[11px] text-purple-700">👵 Grandmother:</p>
-                <p className="italic mt-0.5">"So much text... I don't understand anything... ??"</p>
-              </div>
-              <div className="p-3 bg-amber-50/80 rounded-2xl border border-amber-200 text-amber-900">
-                <p className="font-bold text-[11px] text-amber-700">👧 Daughter:</p>
-                <p className="italic mt-0.5">"Now I understand! So easy! ♡"</p>
-              </div>
-            </div>
-
-            {/* Mobile Luminous Tablet with Active Voice */}
-            <div className="w-full bg-white rounded-2xl border-2 border-sky-200 shadow-xl p-4 flex flex-col space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                <span className="text-xs font-bold text-slate-700">
-                  Converted to your language
-                </span>
-                <div className="relative">
-                  <button
-                    onClick={() => setShowTabletLangMenu(!showTabletLangMenu)}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 border border-sky-200 text-xs font-bold"
-                  >
-                    <span>{SUPPORTED_LANGUAGES.find(l => l.code === activeTabletLang)?.nativeName || 'Tamil'}</span>
-                    <ChevronDown className="w-3.5 h-3.5" />
-                  </button>
-                  {showTabletLangMenu && (
-                    <div className="absolute right-0 top-full mt-1 w-44 max-h-48 overflow-y-auto bg-white rounded-xl shadow-xl border border-slate-200 py-1 z-50">
-                      {SUPPORTED_LANGUAGES.map((lang) => (
-                        <button
-                          key={lang.code}
-                          onClick={() => handleSelectTabletLang(lang.code)}
-                          className="w-full text-left px-3 py-1.5 text-xs hover:bg-sky-50 flex items-center justify-between"
-                        >
-                          <span>{lang.nativeName}</span>
-                          <span className="text-[10px] text-slate-400">{lang.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-extrabold text-slate-900">
-                  {TABLET_TRANSLATIONS[activeTabletLang]?.header || TABLET_TRANSLATIONS.ta.header}
-                </h3>
-                <div className="mt-2 space-y-1.5 text-xs text-slate-700">
-                  {(TABLET_TRANSLATIONS[activeTabletLang]?.items || TABLET_TRANSLATIONS.ta.items).map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <span className="text-emerald-600 font-bold">✓</span>
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Audio player bar */}
-              <div className="pt-2 border-t border-slate-100 flex items-center gap-2">
-                <button
-                  onClick={handleToggleTabletSpeech}
-                  className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md"
-                >
-                  {isPlayingTabletVoice ? <Pause className="w-3.5 h-3.5 fill-white" /> : <Play className="w-3.5 h-3.5 fill-white ml-0.5" />}
-                </button>
-                <div className="flex-1 flex items-center justify-center gap-1 h-6">
-                  {[35, 60, 85, 45, 95, 75, 40, 90, 65, 80, 50, 95].map((h, i) => (
-                    <span
-                      key={i}
-                      className={`w-1 rounded-full ${isPlayingTabletVoice ? 'bg-blue-600' : 'bg-blue-300'}`}
-                      style={{ height: `${isPlayingTabletVoice ? h : h * 0.4}%` }}
-                    />
-                  ))}
-                </div>
-                <Volume2 className={`w-4 h-4 ${isPlayingTabletVoice ? 'text-blue-600 animate-pulse' : 'text-slate-400'}`} />
-              </div>
-            </div>
-
-            {/* Mobile 4 Feature Cards */}
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <div onClick={onGetStarted} className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs text-left cursor-pointer">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs mb-1.5">📄</div>
-                <p className="font-bold text-xs text-slate-900">Upload Document</p>
-                <p className="text-[10px] text-slate-500">PDF, image or prescriptions</p>
-              </div>
-              <div onClick={() => setShowTabletLangMenu(true)} className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs text-left cursor-pointer">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs mb-1.5">🌐</div>
-                <p className="font-bold text-xs text-slate-900">Translate Instantly</p>
-                <p className="text-[10px] text-slate-500">Choose preferred language</p>
-              </div>
-              <div onClick={scrollToDemo} className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs text-left cursor-pointer">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs mb-1.5">👨‍⚕️</div>
-                <p className="font-bold text-xs text-slate-900">Get Simple Explanation</p>
-                <p className="text-[10px] text-slate-500">AI converts to easy language</p>
-              </div>
-              <div onClick={() => setShowTabletLangMenu(true)} className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs text-left cursor-pointer">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs mb-1.5">🇮🇳</div>
-                <p className="font-bold text-xs text-slate-900">In Any Language</p>
-                <p className="text-[10px] text-slate-500">All 11 Indian languages</p>
-              </div>
-            </div>
 
           </div>
 

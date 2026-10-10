@@ -17,11 +17,15 @@ import {
   ShieldCheck,
   Check,
   Layers,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Play,
+  Pause,
+  ChevronDown
 } from 'lucide-react';
 import { SupportedLanguage, SUPPORTED_LANGUAGES } from '../../types/medscript';
 import { KrishXTattvaAvatar } from '../KrishXTattvaAvatar';
 import { SpeechManager } from '../../utils/speech';
+import { TABLET_TRANSLATIONS } from '../Workflow/LandingScreen';
 
 export interface DocuEaseLandingProps {
   onNavigate: (route: string, state?: any) => void;
@@ -29,14 +33,6 @@ export interface DocuEaseLandingProps {
   onLanguageChange: (lang: SupportedLanguage) => void;
 }
 
-/**
- * DocuEaseLanding — Breathtaking Landing Page for HackSphere AI Hackathon
- * Features:
- * - 3D Human Avatar: Krish X Tattva (pastel teal & white hoodie, waving, breathing idle, speech visemes)
- * - 11 Regional Indian Languages + Multilingual Native TTS Preview
- * - Direct routing to MedScan AI and DocuSimplify AI
- * - 1-Click Instant Evaluation Samples for Hackathon Judges
- */
 export const DocuEaseLanding: React.FC<DocuEaseLandingProps> = ({
   onNavigate,
   currentLanguage,
@@ -48,10 +44,45 @@ export const DocuEaseLanding: React.FC<DocuEaseLandingProps> = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
+  // Floating Tablet State
+  const [isPlayingTabletVoice, setIsPlayingTabletVoice] = useState(false);
+  const [showTabletLangMenu, setShowTabletLangMenu] = useState(false);
+  const [activeTabletLang, setActiveTabletLang] = useState<SupportedLanguage>(currentLanguage);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const selectedLangObj = SUPPORTED_LANGUAGES.find((l) => l.code === currentLanguage) || SUPPORTED_LANGUAGES[0];
+
+  const handleToggleTabletSpeech = () => {
+    if (isPlayingTabletVoice) {
+      SpeechManager.stop();
+      setIsPlayingTabletVoice(false);
+    } else {
+      SpeechManager.stop();
+      setDemoSpeaking(false);
+      setIsPlayingTabletVoice(true);
+      const tabletData = TABLET_TRANSLATIONS[activeTabletLang] || TABLET_TRANSLATIONS.ta || TABLET_TRANSLATIONS.en;
+      SpeechManager.speak(
+        tabletData.spoken,
+        activeTabletLang,
+        {
+          onEnd: () => setIsPlayingTabletVoice(false),
+          onError: () => setIsPlayingTabletVoice(false)
+        }
+      );
+    }
+  };
+
+  const handleSelectTabletLang = (langCode: SupportedLanguage) => {
+    setActiveTabletLang(langCode);
+    setShowTabletLangMenu(false);
+    onLanguageChange(langCode);
+    if (isPlayingTabletVoice) {
+      SpeechManager.stop();
+      setIsPlayingTabletVoice(false);
+    }
+  };
 
   // Regional Spoken Greeting Scripts
   const greetings: Record<SupportedLanguage, string> = {
@@ -181,108 +212,165 @@ export const DocuEaseLanding: React.FC<DocuEaseLandingProps> = ({
         </div>
       </div>
 
-      {/* HERO SECTION WITH KRISH X TATTVA 3D AVATAR */}
-      <section className="relative pt-10 pb-16 lg:pt-14 lg:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-gradient-to-tr from-teal-400/15 via-cyan-400/15 to-transparent blur-3xl pointer-events-none -z-10" />
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+      {/* EXACT GRANDMOTHER COVER HERO SECTION (Always Displayed & Instantly Responsive) */}
+      <section className="relative w-full bg-[#f4f9fd] overflow-hidden pt-2 pb-8 sm:pb-12 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl sm:shadow-2xl shadow-sky-900/10 border border-sky-100 bg-[#eaf4fd]">
           
-          {/* Left Column: Headline, Voice Demo & CTAs */}
-          <div className="lg:col-span-7 flex flex-col items-start space-y-6 text-left">
-            
-            {/* HackSphere Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200/80 shadow-xs">
-              <span className="w-2.5 h-2.5 rounded-full bg-teal-500 animate-pulse" />
-              <span className="text-xs font-black text-teal-900 tracking-wide uppercase">
-                DocuEase AI • HackSphere AI
-              </span>
-              <span className="text-teal-300">•</span>
-              <span className="text-xs font-semibold text-teal-700">
-                Krish X Tattva 3D Edition
-              </span>
+          {/* Exact Grandmother Scene Image */}
+          <img 
+            src="/grandmother_cover.jpg" 
+            alt="DocuEase Cover: From Confusing Documents to Clear Understanding"
+            className="w-full h-auto object-cover select-none pointer-events-none block"
+            loading="eager"
+          />
+
+          {/* LIVE WORKING HOTSPOT: Try Now Button */}
+          <button
+            onClick={() => {
+              if (fileInputRef.current) {
+                fileInputRef.current.click();
+              } else {
+                onNavigate('/medscan');
+              }
+            }}
+            className="absolute left-[6.1%] top-[39.2%] w-[12.2%] h-[6.8%] min-h-[38px] rounded-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] hover:from-[#4f46e5] hover:to-[#4338ca] text-white font-bold text-xs lg:text-sm tracking-wide shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 group cursor-pointer z-20"
+            title="Try DocuEase AI Now"
+          >
+            <span>Try Now</span>
+            <span className="text-indigo-200 group-hover:translate-x-0.5 transition-transform">→</span>
+          </button>
+
+          {/* LIVE WORKING FLOATING LUMINOUS TABLET */}
+          <div 
+            className="absolute left-[59.3%] top-[20.8%] w-[25.8%] h-[40.8%] bg-white/95 backdrop-blur-md rounded-2xl lg:rounded-3xl border-2 border-sky-200/90 shadow-[0_8px_30px_rgba(56,189,248,0.22)] p-2.5 sm:p-3 lg:p-4 flex flex-col justify-between z-20 transition-all hover:shadow-[0_12px_36px_rgba(56,189,248,0.32)]"
+          >
+            {/* Top Bar: Converted to your language + Language Dropdown */}
+            <div className="flex items-center justify-between gap-1 border-b border-slate-100 pb-1.5 sm:pb-2">
+              <div className="flex items-center gap-1.5 overflow-hidden">
+                <div className="w-5 h-5 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <FileText className="w-3 h-3 text-blue-600" />
+                </div>
+                <span className="text-[10px] sm:text-[11px] lg:text-xs font-bold text-slate-700 truncate">
+                  Converted to your language
+                </span>
+              </div>
+
+              {/* Language Dropdown */}
+              <div className="relative shrink-0">
+                <button
+                  onClick={() => setShowTabletLangMenu(!showTabletLangMenu)}
+                  className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-[10px] sm:text-xs font-bold transition-colors cursor-pointer"
+                  title="Change Tablet Language"
+                >
+                  <span>
+                    {SUPPORTED_LANGUAGES.find(l => l.code === activeTabletLang)?.nativeName || 'Tamil'}
+                  </span>
+                  <ChevronDown className={`w-3 h-3 text-sky-600 transition-transform ${showTabletLangMenu ? 'rotate-180' : ''}`} />
+                </button>
+
+                {showTabletLangMenu && (
+                  <div className="absolute right-0 top-full mt-1 w-44 max-h-56 overflow-y-auto bg-white rounded-xl shadow-2xl border border-slate-200 py-1 z-50 text-left">
+                    <div className="px-2.5 py-1 text-[9px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                      Choose Language
+                    </div>
+                    {SUPPORTED_LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => handleSelectTabletLang(lang.code)}
+                        className={`w-full text-left px-2.5 py-1.5 text-xs flex items-center justify-between hover:bg-sky-50 transition-colors ${
+                          activeTabletLang === lang.code ? 'font-bold text-sky-700 bg-sky-50/70' : 'text-slate-700'
+                        }`}
+                      >
+                        <span>{lang.nativeName}</span>
+                        <span className="text-[10px] text-slate-400">{lang.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
-              Understand Any Document. <br />
-              <span className="bg-gradient-to-r from-teal-600 via-teal-500 to-cyan-600 bg-clip-text text-transparent">
-                In Your Mother Tongue.
-              </span>
-            </h1>
+            {/* Tablet Content */}
+            <div className="my-auto py-1">
+              <h3 className="text-xs sm:text-sm lg:text-base font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-1">
+                {TABLET_TRANSLATIONS[activeTabletLang]?.header || TABLET_TRANSLATIONS.ta.header}
+              </h3>
 
-            {/* Subtitle */}
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl">
-              From illegible doctor prescriptions and diagnostic lab reports to high-voltage electricity bills and bank KYC compliance notices. 
-              Krish X Tattva, your cute 3D human AI guide in modern pastel teal attire, speaks verified plain-language summaries in your native regional language with synchronized subtitles.
-            </p>
+              <div className="mt-1 sm:mt-1.5 space-y-1 sm:space-y-1.5 text-[9px] sm:text-[10px] lg:text-xs text-slate-700 font-medium">
+                {(TABLET_TRANSLATIONS[activeTabletLang]?.items || TABLET_TRANSLATIONS.ta.items).map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-1.5 leading-tight">
+                    <div className="w-3.5 h-3.5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-[9px] font-bold">✓</span>
+                    </div>
+                    <span className="line-clamp-1">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-            {/* Audio Greeting Feature Button & Tool Hub CTA */}
-            <div className="flex flex-wrap items-center gap-3 pt-1">
+            {/* Tablet Bottom: Working Audio Waveform Player Bar */}
+            <div className="pt-1.5 sm:pt-2 border-t border-slate-100 flex items-center gap-2">
               <button
-                onClick={handlePlayDemoGreeting}
-                className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-slate-950 font-black text-xs shadow-md transition hover:scale-102"
-                title="Hear Krish X Tattva speak in your language"
+                onClick={handleToggleTabletSpeech}
+                className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md shadow-blue-600/30 transition-transform hover:scale-105 active:scale-95 shrink-0 cursor-pointer"
+                title={isPlayingTabletVoice ? 'Pause Audio' : 'Play Spoken Audio in this Language'}
               >
-                <Volume2 className={`w-4 h-4 ${demoSpeaking ? 'animate-bounce' : ''}`} />
-                <span>{demoSpeaking ? 'Speaking Now...' : `Hear Krish in ${selectedLangObj.nativeName}`}</span>
+                {isPlayingTabletVoice ? (
+                  <Pause className="w-3 h-3 lg:w-3.5 lg:h-3.5 fill-white" />
+                ) : (
+                  <Play className="w-3 h-3 lg:w-3.5 lg:h-3.5 fill-white ml-0.5" />
+                )}
               </button>
 
-              <button
-                onClick={() => onNavigate('/dashboard')}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition"
+              <div className="flex-1 flex items-center justify-center gap-0.5 sm:gap-1 h-5 sm:h-6 px-1">
+                {[35, 60, 85, 45, 95, 75, 40, 90, 65, 80, 50, 95, 70, 45, 85, 60].map((h, i) => (
+                  <span
+                    key={i}
+                    className={`w-0.5 sm:w-1 rounded-full transition-all duration-150 ${
+                      isPlayingTabletVoice ? 'bg-blue-600' : 'bg-blue-400/50'
+                    }`}
+                    style={{
+                      height: isPlayingTabletVoice 
+                        ? `${Math.max(20, (h * (0.5 + 0.5 * Math.sin(Date.now() / 250 + i * 0.8))))}%` 
+                        : `${Math.max(20, h * 0.45)}%`,
+                      transition: 'height 0.15s ease-in-out'
+                    }}
+                  />
+                ))}
+              </div>
+
+              <div 
+                onClick={handleToggleTabletSpeech}
+                className="cursor-pointer text-slate-500 hover:text-blue-600 transition-colors shrink-0" 
+                title="Toggle Audio Voice"
               >
-                <Layers className="w-4 h-4 text-teal-400" />
-                <span>Open Tool Hub →</span>
-              </button>
+                <Volume2 className={`w-3.5 h-3.5 lg:w-4 lg:h-4 ${isPlayingTabletVoice ? 'text-blue-600 animate-pulse' : 'text-slate-400'}`} />
+              </div>
             </div>
 
-            {/* Trust Highlights */}
-            <div className="pt-2 flex flex-wrap items-center gap-5 text-xs text-slate-600">
-              <div className="flex items-center gap-1.5 font-bold text-slate-800">
-                <CheckCircle2 className="w-4 h-4 text-teal-600" />
-                <span>Zero Hallucination Guarantee</span>
-              </div>
-              <div className="flex items-center gap-1.5 font-bold text-slate-800">
-                <CheckCircle2 className="w-4 h-4 text-teal-600" />
-                <span>Synchronized Karaoke Subtitles</span>
-              </div>
-              <div className="flex items-center gap-1.5 font-bold text-slate-800">
-                <CheckCircle2 className="w-4 h-4 text-teal-600" />
-                <span>Deterministic Clinical Safety Checks</span>
-              </div>
-            </div>
           </div>
 
-          {/* Right Column: Cute 3D Human Krish X Tattva Assistant */}
-          <div className="lg:col-span-5 flex flex-col items-center justify-center">
-            <div className="w-full max-w-md relative p-4 rounded-3xl bg-gradient-to-b from-white to-teal-50/40 border border-teal-100 shadow-xl shadow-teal-600/5">
-              
-              {/* Decorative aura badge */}
-              <div className="absolute top-4 right-4 z-10 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-md border border-teal-100 text-[11px] font-bold text-teal-700 flex items-center gap-1.5 shadow-xs">
-                <Sparkles className="w-3 h-3 text-teal-500" />
-                <span>Cute 3D Human Assistant</span>
-              </div>
-
-              {/* Krish X Tattva 3D Component */}
-              <KrishXTattvaAvatar
-                mood={demoSpeaking ? 'speaking' : 'idle'}
-                isSpeaking={demoSpeaking}
-                activeSentence={demoSubtitle}
-                className="w-full"
-                characterTitle="Krish X Tattva"
-                language={currentLanguage}
-                showControls={false}
-              />
-
-              {/* Assistant Bio Tag */}
-              <div className="mt-2 text-center">
-                <h3 className="text-sm font-black text-slate-800">Krish X Tattva — 3D Universal Guide</h3>
-                <p className="text-xs text-slate-500 max-w-xs mx-auto mt-0.5">
-                  Speaking fluently in 11 Indian regional languages with synchronized subtitles.
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* HOTSPOTS: 4 Bottom Feature Cards */}
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="absolute left-[8.5%] top-[74%] w-[14.5%] h-[24%] rounded-2xl cursor-pointer hover:bg-sky-500/10 transition-colors z-20"
+            title="Upload PDF, image or handwritten prescriptions"
+          />
+          <div
+            onClick={() => setShowTabletLangMenu(true)}
+            className="absolute left-[26.5%] top-[74%] w-[14.5%] h-[24%] rounded-2xl cursor-pointer hover:bg-sky-500/10 transition-colors z-20"
+            title="Choose your preferred language"
+          />
+          <div
+            onClick={() => onNavigate('/dashboard')}
+            className="absolute left-[44.5%] top-[74%] w-[14.5%] h-[24%] rounded-2xl cursor-pointer hover:bg-sky-500/10 transition-colors z-20"
+            title="AI converts complex text into easy language"
+          />
+          <div
+            onClick={() => setShowTabletLangMenu(true)}
+            className="absolute left-[62.5%] top-[74%] w-[14.5%] h-[24%] rounded-2xl cursor-pointer hover:bg-sky-500/10 transition-colors z-20"
+            title="From local to global, we've got you covered"
+          />
         </div>
       </section>
 
