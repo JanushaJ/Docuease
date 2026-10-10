@@ -151,6 +151,7 @@ export interface BillDetails {
   provider: string;
   accountNumber?: string;
   consumerName?: string;
+  consumerNumber?: string;
   billingPeriod?: string;
   previousReading?: string;
   currentReading?: string;
@@ -171,6 +172,7 @@ export interface BillDetails {
 export interface FinancialDetails {
   institutionName: string;
   accountRef?: string;
+  accountNumberMasked?: string;
   noticeType: string;
   amountMentioned?: string;
   deadline?: string;

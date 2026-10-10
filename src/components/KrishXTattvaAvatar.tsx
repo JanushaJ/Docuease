@@ -58,7 +58,7 @@ export const KrishXTattvaAvatar: React.FC<KrishXTattvaAvatarProps> = ({
   compact = false,
   showControls = true,
   language = 'en',
-  characterTitle = 'DocuBot (Milo)',
+  characterTitle = 'Dr. Krish (AI Doctor)',
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const [webGlSupported, setWebGlSupported] = useState(true);
@@ -167,57 +167,66 @@ export const KrishXTattvaAvatar: React.FC<KrishXTattvaAvatarProps> = ({
     scene.add(chestPulseLight);
 
     // 3. High-Quality Materials
-    // Glossy Pearl-White Robot Chassis
-    const pearlWhiteMaterial = new THREE.MeshStandardMaterial({
+    // 3. High-Quality Human Healthcare Materials
+    // Soft Warm Human Skin Tone
+    const skinMaterial = new THREE.MeshStandardMaterial({
+      color: 0xfbdac2, // Warm natural peach skin
+      roughness: 0.58,
+      metalness: 0.04,
+    });
+
+    // Rosy Blushing Cheeks
+    const blushMaterial = new THREE.MeshStandardMaterial({
+      color: 0xf43f5e,
+      roughness: 0.6,
+      transparent: true,
+      opacity: 0.32,
+    });
+
+    // Dark Stylish Anime Hair
+    const hairMaterial = new THREE.MeshStandardMaterial({
+      color: 0x1f1917, // Deep natural dark hair
+      roughness: 0.65,
+      metalness: 0.08,
+    });
+
+    // Crisp White Doctor Lab Coat
+    const coatMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff,
-      roughness: 0.18,
-      metalness: 0.1,
+      roughness: 0.28,
+      metalness: 0.02,
     });
 
-    // Vibrant Medical Pastel Teal
-    const tealMaterial = new THREE.MeshStandardMaterial({
-      color: 0x0d9488, // #0D9488 fresh teal
-      roughness: 0.25,
-      metalness: 0.15,
-    });
-
-    // Dark Curved Glass Visor
-    const visorMaterial = new THREE.MeshStandardMaterial({
-      color: 0x0f172a, // Deep slate
-      roughness: 0.1,
-      metalness: 0.85,
-    });
-
-    // Glowing Cyan Anime Eyes
-    const eyeMaterial = new THREE.MeshBasicMaterial({
-      color: 0x22d3ee, // Bright glowing cyan
-    });
-
-    // White Eye Pupil & Specular Highlights
-    const highlightMaterial = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
+    // Medical Teal Scrubs (Underneath Lab Coat)
+    const scrubsMaterial = new THREE.MeshStandardMaterial({
+      color: 0x0d9488, // #0D9488 fresh clinical teal
+      roughness: 0.38,
+      metalness: 0.08,
     });
 
     // Chrome Metallic Stethoscope
     const chromeMaterial = new THREE.MeshStandardMaterial({
       color: 0xe2e8f0,
       roughness: 0.15,
-      metalness: 0.9,
+      metalness: 0.92,
     });
 
-    // Stethoscope Rubber Tubing (Deep Teal)
+    // Stethoscope Rubber Tubing (Deep Teal-Slate)
     const tubeMaterial = new THREE.MeshStandardMaterial({
       color: 0x0f766e,
       roughness: 0.45,
       metalness: 0.05,
     });
 
-    // Glowing Heart Pulse
-    const heartGlowMaterial = new THREE.MeshBasicMaterial({
-      color: 0x34d399, // Emerald mint glow
-    });
+    // Anime Eye Materials
+    const scleraMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const irisMaterial = new THREE.MeshBasicMaterial({ color: 0x451a03 }); // Warm hazel/brown
+    const pupilMaterial = new THREE.MeshBasicMaterial({ color: 0x0f172a }); // Deep pupil
+    const highlightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // Specular highlights
+    const eyebrowMaterial = new THREE.MeshBasicMaterial({ color: 0x1f1917 });
+    const heartGlowMaterial = new THREE.MeshBasicMaterial({ color: 0xef4444 }); // Doctor red cross
 
-    // 4. Constructing 3D Mascot Mesh Tree
+    // 4. Constructing 3D Human Doctor Mesh Tree
     const robotRoot = new THREE.Group();
     scene.add(robotRoot);
 
@@ -233,208 +242,273 @@ export const KrishXTattvaAvatar: React.FC<KrishXTattvaAvatarProps> = ({
     shadowMesh.position.y = -1.15;
     scene.add(shadowMesh);
 
-    // --- BODY (CHASSIS) ---
+    // --- BODY: DOCTOR LAB COAT & SCRUBS ---
     const bodyGroup = new THREE.Group();
     bodyGroup.position.set(0, -0.35, 0);
     robotRoot.add(bodyGroup);
 
-    // Torso: Cute rounded egg/pear shape
+    // Torso: Lab Coat Body
     const torsoGeo = new THREE.SphereGeometry(0.52, 32, 32);
-    torsoGeo.scale(0.95, 1.1, 0.9);
-    const torsoMesh = new THREE.Mesh(torsoGeo, pearlWhiteMaterial);
+    torsoGeo.scale(0.96, 1.15, 0.9);
+    const torsoMesh = new THREE.Mesh(torsoGeo, coatMaterial);
     torsoMesh.castShadow = true;
     bodyGroup.add(torsoMesh);
 
-    // Doctor Scrub Vest / Bib (Front Teal Plate)
-    const vestGeo = new THREE.SphereGeometry(0.53, 32, 16, 0, Math.PI);
-    vestGeo.scale(0.9, 0.9, 0.92);
-    const vestMesh = new THREE.Mesh(vestGeo, tealMaterial);
-    vestMesh.rotation.y = Math.PI / 2;
-    vestMesh.position.set(0, -0.05, 0.03);
-    bodyGroup.add(vestMesh);
+    // Teal Scrubs Shirt (Visible at Chest V-Neck)
+    const scrubsGeo = new THREE.CylinderGeometry(0.24, 0.32, 0.42, 16);
+    scrubsGeo.scale(1.0, 1.0, 0.6);
+    const scrubsMesh = new THREE.Mesh(scrubsGeo, scrubsMaterial);
+    scrubsMesh.position.set(0, 0.18, 0.35);
+    bodyGroup.add(scrubsMesh);
 
-    // Chest Screen / Heart Monitor Badge
-    const badgeGeo = new THREE.BoxGeometry(0.24, 0.16, 0.04);
-    const badgeMat = new THREE.MeshStandardMaterial({ color: 0x134e4a, roughness: 0.2 });
+    // Lab Coat Left & Right Lapels
+    const lapelGeo = new THREE.BoxGeometry(0.12, 0.45, 0.05);
+    const leftLapel = new THREE.Mesh(lapelGeo, coatMaterial);
+    leftLapel.position.set(0.16, 0.14, 0.42);
+    leftLapel.rotation.z = -0.22;
+    bodyGroup.add(leftLapel);
+
+    const rightLapel = new THREE.Mesh(lapelGeo, coatMaterial);
+    rightLapel.position.set(-0.16, 0.14, 0.42);
+    rightLapel.rotation.z = 0.22;
+    bodyGroup.add(rightLapel);
+
+    // Doctor ID Badge ("Dr. Krish • MD")
+    const badgeGeo = new THREE.BoxGeometry(0.18, 0.14, 0.03);
+    const badgeMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
     const badgeMesh = new THREE.Mesh(badgeGeo, badgeMat);
-    badgeMesh.position.set(0, 0.05, 0.48);
-    badgeMesh.rotation.x = -0.1;
+    badgeMesh.position.set(-0.25, 0.06, 0.45);
+    badgeMesh.rotation.y = 0.2;
     bodyGroup.add(badgeMesh);
 
-    // Heart Cross / Pulse on badge
-    const crossHGeo = new THREE.BoxGeometry(0.12, 0.035, 0.02);
-    const crossVGeo = new THREE.BoxGeometry(0.035, 0.12, 0.02);
+    // Red Cross on Doctor Badge
+    const crossHGeo = new THREE.BoxGeometry(0.08, 0.024, 0.02);
+    const crossVGeo = new THREE.BoxGeometry(0.024, 0.08, 0.02);
     const crossH = new THREE.Mesh(crossHGeo, heartGlowMaterial);
     const crossV = new THREE.Mesh(crossVGeo, heartGlowMaterial);
-    crossH.position.set(0, 0.05, 0.51);
-    crossV.position.set(0, 0.05, 0.51);
-    crossH.rotation.x = -0.1;
-    crossV.rotation.x = -0.1;
+    crossH.position.set(-0.25, 0.06, 0.47);
+    crossV.position.set(-0.25, 0.06, 0.47);
+    crossH.rotation.y = 0.2;
+    crossV.rotation.y = 0.2;
     bodyGroup.add(crossH);
     bodyGroup.add(crossV);
 
-    // --- STETHOSCOPE ---
-    // Stethoscope Tube around neck
+    // --- REAL STETHOSCOPE ---
     const stethCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-0.28, 0.22, 0.1),
-      new THREE.Vector3(-0.35, 0.0, 0.35),
-      new THREE.Vector3(0.0, -0.18, 0.48),
-      new THREE.Vector3(0.35, 0.0, 0.35),
-      new THREE.Vector3(0.28, 0.22, 0.1),
+      new THREE.Vector3(-0.24, 0.28, 0.12),
+      new THREE.Vector3(-0.32, 0.02, 0.38),
+      new THREE.Vector3(0.0, -0.16, 0.48),
+      new THREE.Vector3(0.32, 0.02, 0.38),
+      new THREE.Vector3(0.24, 0.28, 0.12),
     ]);
-    const stethGeo = new THREE.TubeGeometry(stethCurve, 32, 0.028, 12, false);
+    const stethGeo = new THREE.TubeGeometry(stethCurve, 32, 0.024, 12, false);
     const stethMesh = new THREE.Mesh(stethGeo, tubeMaterial);
     bodyGroup.add(stethMesh);
 
     // Stethoscope Chestpiece (Bell / Diaphragm)
-    const bellGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.035, 24);
+    const bellGeo = new THREE.CylinderGeometry(0.075, 0.075, 0.03, 24);
     const bellMesh = new THREE.Mesh(bellGeo, chromeMaterial);
-    bellMesh.position.set(0, -0.18, 0.48);
+    bellMesh.position.set(0, -0.16, 0.48);
     bellMesh.rotation.x = Math.PI / 2 - 0.2;
     bodyGroup.add(bellMesh);
 
-    // --- HEAD GROUP ---
+    // --- HEAD GROUP: HUMAN DOCTOR ---
     const headGroup = new THREE.Group();
     headGroup.position.set(0, 0.38, 0);
     robotRoot.add(headGroup);
 
-    // Outer Helmet Chassis: Rounded, cute chibi proportions
-    const helmetGeo = new THREE.SphereGeometry(0.66, 36, 36);
-    helmetGeo.scale(1.08, 0.98, 1.0);
-    const helmetMesh = new THREE.Mesh(helmetGeo, pearlWhiteMaterial);
-    helmetMesh.castShadow = true;
-    headGroup.add(helmetMesh);
+    // Human Head: Cute stylized proportions
+    const headGeo = new THREE.SphereGeometry(0.58, 36, 36);
+    headGeo.scale(1.0, 1.05, 0.96);
+    const headMesh = new THREE.Mesh(headGeo, skinMaterial);
+    headMesh.castShadow = true;
+    headGroup.add(headMesh);
 
-    // Curved Obsidian Visor Face Plate
-    const visorGeo = new THREE.SphereGeometry(0.63, 32, 32, 0, Math.PI * 0.9, 0, Math.PI * 0.65);
-    visorGeo.scale(0.98, 0.88, 0.98);
-    const visorMesh = new THREE.Mesh(visorGeo, visorMaterial);
-    visorMesh.position.set(0, -0.04, 0.08);
-    visorMesh.rotation.x = 0.15;
-    headGroup.add(visorMesh);
-
-    // Side Earmuffs / Headphone Pods (Teal with Chrome ring)
-    const earGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.12, 24);
-    earGeo.rotateZ(Math.PI / 2);
-
-    const leftEar = new THREE.Mesh(earGeo, tealMaterial);
-    leftEar.position.set(0.72, 0, 0);
+    // Cute Ears
+    const earGeo = new THREE.SphereGeometry(0.12, 16, 16);
+    earGeo.scale(0.5, 1.0, 0.7);
+    const leftEar = new THREE.Mesh(earGeo, skinMaterial);
+    leftEar.position.set(0.56, -0.02, 0.0);
     headGroup.add(leftEar);
 
-    const leftEarRing = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.02, 16, 32), chromeMaterial);
-    leftEarRing.rotation.y = Math.PI / 2;
-    leftEarRing.position.set(0.78, 0, 0);
-    headGroup.add(leftEarRing);
-
-    const rightEar = new THREE.Mesh(earGeo, tealMaterial);
-    rightEar.position.set(-0.72, 0, 0);
+    const rightEar = new THREE.Mesh(earGeo, skinMaterial);
+    rightEar.position.set(-0.56, -0.02, 0.0);
     headGroup.add(rightEar);
 
-    const rightEarRing = leftEarRing.clone();
-    rightEarRing.position.set(-0.78, 0, 0);
-    headGroup.add(rightEarRing);
+    // Rosy Blushing Cheeks
+    const cheekGeo = new THREE.SphereGeometry(0.1, 16, 16);
+    cheekGeo.scale(1.2, 0.6, 0.3);
+    const leftCheek = new THREE.Mesh(cheekGeo, blushMaterial);
+    leftCheek.position.set(0.3, -0.12, 0.48);
+    headGroup.add(leftCheek);
 
-    // Top Antenna
-    const stemGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.22, 12);
-    const stemMesh = new THREE.Mesh(stemGeo, chromeMaterial);
-    stemMesh.position.set(0, 0.72, 0);
-    headGroup.add(stemMesh);
+    const rightCheek = new THREE.Mesh(cheekGeo, blushMaterial);
+    rightCheek.position.set(-0.3, -0.12, 0.48);
+    headGroup.add(rightCheek);
 
-    const orbGeo = new THREE.SphereGeometry(0.09, 20, 20);
-    const orbMat = new THREE.MeshStandardMaterial({
-      color: 0x14b8a6,
-      emissive: 0x14b8a6,
-      emissiveIntensity: 0.8,
-      roughness: 0.1,
-    });
-    const orbMesh = new THREE.Mesh(orbGeo, orbMat);
-    orbMesh.position.set(0, 0.84, 0);
-    headGroup.add(orbMesh);
+    // Tiny Cute Button Nose
+    const noseGeo = new THREE.SphereGeometry(0.045, 12, 12);
+    const noseMesh = new THREE.Mesh(noseGeo, skinMaterial);
+    noseMesh.position.set(0, -0.04, 0.58);
+    headGroup.add(noseMesh);
 
-    // --- EXPRESSIVE EYES ---
+    // --- STYLISH DARK HAIR ---
+    // Hair Back & Top Volume
+    const hairGeo = new THREE.SphereGeometry(0.62, 36, 36);
+    hairGeo.scale(1.04, 1.06, 1.04);
+    const hairMesh = new THREE.Mesh(hairGeo, hairMaterial);
+    hairMesh.position.set(0, 0.06, -0.06);
+    headGroup.add(hairMesh);
+
+    // Front Bangs / Hair Fringe
+    const bangGeo1 = new THREE.SphereGeometry(0.24, 16, 16);
+    bangGeo1.scale(1.2, 0.7, 0.6);
+    const bang1 = new THREE.Mesh(bangGeo1, hairMaterial);
+    bang1.position.set(-0.16, 0.42, 0.45);
+    bang1.rotation.z = 0.2;
+    headGroup.add(bang1);
+
+    const bangGeo2 = new THREE.SphereGeometry(0.22, 16, 16);
+    bangGeo2.scale(1.1, 0.65, 0.6);
+    const bang2 = new THREE.Mesh(bangGeo2, hairMaterial);
+    bang2.position.set(0.18, 0.44, 0.44);
+    bang2.rotation.z = -0.15;
+    headGroup.add(bang2);
+
+    // Hair Side Tufts
+    const tuftGeo = new THREE.ConeGeometry(0.1, 0.3, 12);
+    const leftTuft = new THREE.Mesh(tuftGeo, hairMaterial);
+    leftTuft.position.set(0.55, 0.1, 0.15);
+    leftTuft.rotation.z = -0.3;
+    headGroup.add(leftTuft);
+
+    const rightTuft = new THREE.Mesh(tuftGeo, hairMaterial);
+    rightTuft.position.set(-0.55, 0.1, 0.15);
+    rightTuft.rotation.z = 0.3;
+    headGroup.add(rightTuft);
+
+    // --- EXPRESSIVE ANIME HUMAN EYES ---
     const eyeGroup = new THREE.Group();
-    eyeGroup.position.set(0, -0.02, 0.58);
+    eyeGroup.position.set(0, 0.02, 0.52);
     headGroup.add(eyeGroup);
 
-    // Left Eye & Highlights
-    const eyeShapeGeo = new THREE.SphereGeometry(0.13, 24, 24);
+    // Left Eye
+    const eyeShapeGeo = new THREE.SphereGeometry(0.12, 24, 24);
     eyeShapeGeo.scale(1.0, 1.25, 0.35);
 
-    const leftEye = new THREE.Mesh(eyeShapeGeo, eyeMaterial);
-    leftEye.position.set(0.24, 0.04, 0);
+    const leftEye = new THREE.Mesh(eyeShapeGeo, scleraMaterial);
+    leftEye.position.set(0.22, 0.02, 0);
     eyeGroup.add(leftEye);
 
-    // Big anime sparkle pupil highlight
-    const sparkleBigGeo = new THREE.SphereGeometry(0.045, 16, 16);
+    // Left Hazel Iris
+    const irisGeo = new THREE.SphereGeometry(0.08, 20, 20);
+    irisGeo.scale(1.0, 1.15, 0.25);
+    const leftIris = new THREE.Mesh(irisGeo, irisMaterial);
+    leftIris.position.set(0.22, 0.02, 0.03);
+    eyeGroup.add(leftIris);
+
+    // Left Pupil
+    const pupilGeo = new THREE.SphereGeometry(0.045, 16, 16);
+    pupilGeo.scale(1.0, 1.1, 0.2);
+    const leftPupil = new THREE.Mesh(pupilGeo, pupilMaterial);
+    leftPupil.position.set(0.22, 0.02, 0.05);
+    eyeGroup.add(leftPupil);
+
+    // Left Eye Sparkle Highlights
+    const sparkleBigGeo = new THREE.SphereGeometry(0.038, 16, 16);
     sparkleBigGeo.scale(1.0, 1.0, 0.2);
     const leftSparkle1 = new THREE.Mesh(sparkleBigGeo, highlightMaterial);
-    leftSparkle1.position.set(0.26, 0.09, 0.06);
+    leftSparkle1.position.set(0.24, 0.06, 0.065);
     eyeGroup.add(leftSparkle1);
 
-    const sparkleSmallGeo = new THREE.SphereGeometry(0.025, 12, 12);
+    const sparkleSmallGeo = new THREE.SphereGeometry(0.02, 12, 12);
     sparkleSmallGeo.scale(1.0, 1.0, 0.2);
     const leftSparkle2 = new THREE.Mesh(sparkleSmallGeo, highlightMaterial);
-    leftSparkle2.position.set(0.21, 0.0, 0.06);
+    leftSparkle2.position.set(0.19, -0.01, 0.065);
     eyeGroup.add(leftSparkle2);
 
-    // Right Eye & Highlights
-    const rightEye = new THREE.Mesh(eyeShapeGeo, eyeMaterial);
-    rightEye.position.set(-0.24, 0.04, 0);
+    // Right Eye
+    const rightEye = new THREE.Mesh(eyeShapeGeo, scleraMaterial);
+    rightEye.position.set(-0.22, 0.02, 0);
     eyeGroup.add(rightEye);
 
+    const rightIris = new THREE.Mesh(irisGeo, irisMaterial);
+    rightIris.position.set(-0.22, 0.02, 0.03);
+    eyeGroup.add(rightIris);
+
+    const rightPupil = new THREE.Mesh(pupilGeo, pupilMaterial);
+    rightPupil.position.set(-0.22, 0.02, 0.05);
+    eyeGroup.add(rightPupil);
+
     const rightSparkle1 = leftSparkle1.clone();
-    rightSparkle1.position.set(-0.22, 0.09, 0.06);
+    rightSparkle1.position.set(-0.20, 0.06, 0.065);
     eyeGroup.add(rightSparkle1);
 
     const rightSparkle2 = leftSparkle2.clone();
-    rightSparkle2.position.set(-0.27, 0.0, 0.06);
+    rightSparkle2.position.set(-0.25, -0.01, 0.065);
     eyeGroup.add(rightSparkle2);
 
-    // Mouth: Digital LED smiling arc / speech waveform
+    // Eyebrows
+    const browCurve = new THREE.QuadraticBezierCurve3(
+      new THREE.Vector3(-0.09, -0.01, 0),
+      new THREE.Vector3(0, 0.03, 0.01),
+      new THREE.Vector3(0.09, -0.01, 0)
+    );
+    const browGeo = new THREE.TubeGeometry(browCurve, 16, 0.015, 6, false);
+    const leftBrow = new THREE.Mesh(browGeo, eyebrowMaterial);
+    leftBrow.position.set(0.22, 0.18, 0.54);
+    leftBrow.rotation.z = -0.1;
+    headGroup.add(leftBrow);
+
+    const rightBrow = new THREE.Mesh(browGeo, eyebrowMaterial);
+    rightBrow.position.set(-0.22, 0.18, 0.54);
+    rightBrow.rotation.z = 0.1;
+    headGroup.add(rightBrow);
+
+    // --- SMILING HUMAN MOUTH ---
     const mouthGroup = new THREE.Group();
-    mouthGroup.position.set(0, -0.22, 0.58);
+    mouthGroup.position.set(0, -0.20, 0.54);
     headGroup.add(mouthGroup);
 
     const smileCurve = new THREE.QuadraticBezierCurve3(
-      new THREE.Vector3(-0.12, 0.03, 0),
+      new THREE.Vector3(-0.11, 0.02, 0),
       new THREE.Vector3(0, -0.04, 0.02),
-      new THREE.Vector3(0.12, 0.03, 0)
+      new THREE.Vector3(0.11, 0.02, 0)
     );
-    const mouthGeo = new THREE.TubeGeometry(smileCurve, 20, 0.02, 8, false);
-    const mouthMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee });
+    const mouthGeo = new THREE.TubeGeometry(smileCurve, 20, 0.018, 8, false);
+    const mouthMat = new THREE.MeshStandardMaterial({ color: 0xbe123c, roughness: 0.4 });
     const mouthMesh = new THREE.Mesh(mouthGeo, mouthMat);
     mouthGroup.add(mouthMesh);
 
-    // --- MAGNETIC FLOATING HANDS ---
-    // Left Hand (Mitten)
-    const handGeo = new THREE.SphereGeometry(0.16, 20, 20);
-    handGeo.scale(0.85, 1.1, 0.7);
-
+    // --- DOCTOR ARMS & HANDS ---
+    // Left Arm (Lab Coat Sleeve + Skin Hand)
     const leftHandGroup = new THREE.Group();
-    leftHandGroup.position.set(0.68, -0.32, 0.15);
+    leftHandGroup.position.set(0.62, -0.32, 0.15);
     robotRoot.add(leftHandGroup);
 
-    const leftHandMesh = new THREE.Mesh(handGeo, pearlWhiteMaterial);
+    const sleeveGeo = new THREE.CylinderGeometry(0.12, 0.14, 0.35, 16);
+    const leftSleeve = new THREE.Mesh(sleeveGeo, coatMaterial);
+    leftSleeve.position.set(0, 0.1, 0);
+    leftHandGroup.add(leftSleeve);
+
+    const handGeo = new THREE.SphereGeometry(0.12, 20, 20);
+    handGeo.scale(0.85, 1.0, 0.65);
+    const leftHandMesh = new THREE.Mesh(handGeo, skinMaterial);
     leftHandMesh.castShadow = true;
     leftHandGroup.add(leftHandMesh);
 
-    const thumbGeo = new THREE.SphereGeometry(0.06, 12, 12);
-    const leftThumb = new THREE.Mesh(thumbGeo, tealMaterial);
-    leftThumb.position.set(-0.06, 0.05, 0.06);
-    leftHandGroup.add(leftThumb);
-
-    // Right Hand (Friendly Waving Mitten)
+    // Right Arm (Friendly Waving Doctor Hand)
     const rightHandGroup = new THREE.Group();
-    rightHandGroup.position.set(-0.68, -0.32, 0.15);
+    rightHandGroup.position.set(-0.62, -0.32, 0.15);
     robotRoot.add(rightHandGroup);
 
-    const rightHandMesh = new THREE.Mesh(handGeo, pearlWhiteMaterial);
+    const rightSleeve = new THREE.Mesh(sleeveGeo, coatMaterial);
+    rightSleeve.position.set(0, 0.1, 0);
+    rightHandGroup.add(rightSleeve);
+
+    const rightHandMesh = new THREE.Mesh(handGeo, skinMaterial);
     rightHandMesh.castShadow = true;
     rightHandGroup.add(rightHandMesh);
-
-    const rightThumb = new THREE.Mesh(thumbGeo, tealMaterial);
-    rightThumb.position.set(0.06, 0.05, 0.06);
-    rightHandGroup.add(rightThumb);
 
     // 5. 60 FPS Dynamic Animation Loop
     let animationFrameId: number;
@@ -486,14 +560,11 @@ export const KrishXTattvaAvatar: React.FC<KrishXTattvaAvatarProps> = ({
         }
       }
 
-      // Heart Monitor gentle pulsing
-      const heartPulse = 1.0 + Math.sin(time * 5.0) * 0.18;
+      // Doctor ID badge cross pulse
+      const heartPulse = 1.0 + Math.sin(time * 5.0) * 0.12;
       crossH.scale.setScalar(heartPulse);
       crossV.scale.setScalar(heartPulse);
-      chestPulseLight.intensity = 1.2 + heartPulse * 0.5;
-
-      // Antenna Orb Pulse
-      orbMat.emissiveIntensity = 0.6 + Math.sin(time * 3.5) * 0.4;
+      chestPulseLight.intensity = 1.0 + heartPulse * 0.4;
 
       // Hand Animations: Cheerful Wave on Right Hand
       if (moodRef.current === 'greeting' || !isSpeakingRef.current) {
@@ -525,8 +596,7 @@ export const KrishXTattvaAvatar: React.FC<KrishXTattvaAvatarProps> = ({
         rightHandGroup.position.y = -0.2 + Math.cos(time * 6.0) * 0.08;
         rightHandGroup.rotation.x = -0.2 + Math.sin(time * 6.0) * 0.2;
 
-        // Antenna pulses brighter during speech
-        orbMat.emissiveIntensity = 1.2 + Math.sin(time * 10.0) * 0.5;
+
       } else {
         mouthGroup.scale.set(1.0, 1.0, 1.0);
         headGroup.position.y = 0.38;

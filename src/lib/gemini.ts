@@ -85,10 +85,12 @@ CRITICAL ZERO-REJECTION & HANDWRITING ACCURACY RULES:
    - Accurately decipher doctor cursive notes, clinical shorthand, and medicine names.
    - Extract prescribed medicines with exact strength, dosages (e.g., 1-0-1, OD, BD, TDS, SOS), frequency, and duration.
    - If any handwriting or abbreviation is unclear or ambiguous, explicitly set "isLegible": false and "needsPharmacistVerification": true. Explain the detected dosage pattern without guessing.
-3. FOR LAB REPORTS (Liver Function, Hepatitis, CBC, Metabolic Panels, Blood Tests):
-   - Extract EXACT biomarkers (e.g., SGPT/ALT, SGOT/AST, Bilirubin, HBsAg, Platelets), numerical values, units, and reference ranges.
-   - Classify each marker strictly as "Normal", "Elevated", or "Low" based on the paper's reference range.
-   - NEVER hallucinate or output irrelevant text like "No prescription medicines or daily fever tablets are listed." Provide a clean, professional clinical breakdown of the findings.
+3. FOR LAB REPORTS & SEROLOGY (Hepatitis B / HBsAg, HCV, Liver Function, CBC, Blood Tests):
+   - Set "documentSubtype": "LAB_REPORT".
+   - "medications" MUST BE AN EMPTY ARRAY []! NEVER hallucinate, invent, guess, or fabricate any medications, pills, or daily dosages for diagnostic laboratory documents.
+   - Extract EXACT biomarkers from the paper (e.g., HBsAg, Anti-HCV, SGPT/ALT, SGOT/AST, Bilirubin, Platelets), with exact numerical values (e.g. 0.35), units (e.g. S/CO), and reference ranges (e.g. < 0.90 S/CO Non-Reactive).
+   - If HBsAg is < 0.90 or labeled Non-Reactive, classify as "Normal" with clinical note "NON-REACTIVE (Negative). No active Hepatitis B viral infection detected."
+   - Never say to take medicines or pills for a diagnostic lab test with no prescription.
 4. NATIVE TRANSLATION:
    - Translate clinicalSummary, simpleExplanation, actionItems, and spokenExplanation fully and fluently into ${targetLanguageName} (${targetLanguageCode}).
    - Use natural phrasing suitable for regional speech synthesis.

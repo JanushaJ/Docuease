@@ -48,81 +48,89 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-teal-100/80 shadow-2xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
-        {/* Brand Logo & Name */}
+        {/* Brand Logo & Name Matching Reference Image */}
         <div 
           onClick={() => handleNav('home')}
-          className="flex items-center gap-3 cursor-pointer group"
+          className="flex items-center gap-2.5 cursor-pointer group"
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter') handleNav('home'); }}
-          aria-label="DocuEase AI Home"
+          aria-label="DocuEase Documents Made Simple"
         >
-          {/* Professional Medical Robot Icon */}
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-600 to-teal-800 flex items-center justify-center text-white shadow-sm shadow-teal-700/20 transition-transform group-hover:scale-105">
-            <Stethoscope className="w-5 h-5 text-teal-100" />
+          {/* Document Upload Icon */}
+          <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center shadow-2xs transition-transform group-hover:scale-105">
+            <svg className="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+              <polyline points="14 2 14 8 20 8" />
+              <path d="M12 18v-6" />
+              <path d="m9 15 3-3 3 3" />
+            </svg>
           </div>
 
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl font-extrabold text-slate-900 tracking-tight">
-                {t.brandName.split(' ')[0]} <span className="text-teal-700">{t.brandName.split(' ')[1] || 'AI'}</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xl font-extrabold text-[#1e293b] tracking-tight">
+                DocuEase
               </span>
-              <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-teal-50 text-teal-800 rounded-full border border-teal-200">
-                <Sparkles className="w-3 h-3 text-teal-600" />
-                {t.tagline}
-              </span>
+              <Sparkles className="w-3.5 h-3.5 text-blue-500" />
             </div>
-            <p className="text-[11px] text-slate-500 font-medium tracking-tight hidden sm:block">
-              {t.tagDocsToSimple} • {t.stat11Languages}
+            <p className="text-[11px] text-slate-500 font-semibold tracking-tight">
+              Documents Made Simple
             </p>
           </div>
         </div>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1 bg-slate-100/90 p-1 rounded-xl border border-slate-200">
+        {/* Desktop Navigation Links (Home, Features, How It Works, About, Contact) */}
+        <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-600">
           <button
             onClick={() => handleNav('home')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              currentRoute === 'home'
-                ? 'bg-white text-teal-800 shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
+            className={`transition-colors hover:text-blue-600 ${
+              currentRoute === 'home' ? 'text-blue-600 font-bold' : ''
             }`}
           >
-            {t.navHome}
+            Home
           </button>
-
           <button
             onClick={() => handleNav('dashboard')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              currentRoute === 'dashboard'
-                ? 'bg-white text-teal-800 shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
+            className="transition-colors hover:text-blue-600"
           >
-            <Layers className="w-3.5 h-3.5" />
-            <span>{t.navDashboard}</span>
+            Features
           </button>
-
+          <button
+            onClick={() => handleNav('how-it-works')}
+            className="transition-colors hover:text-blue-600"
+          >
+            How It Works
+          </button>
           <button
             onClick={() => handleNav('privacy')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              currentRoute === 'privacy'
-                ? 'bg-white text-teal-800 shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
+            className="transition-colors hover:text-blue-600"
           >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>{t.navPrivacy}</span>
+            About
+          </button>
+          <button
+            onClick={() => onOpenPrivacy ? onOpenPrivacy() : handleNav('privacy')}
+            className="transition-colors hover:text-blue-600"
+          >
+            Contact
           </button>
         </nav>
 
-        {/* Right: Language Selector & Mobile Trigger */}
-        <div className="flex items-center gap-2.5">
+        {/* Right: Language Selector & "Try Now →" Button */}
+        <div className="flex items-center gap-3">
           <LanguageSelector
             currentLanguage={currentLanguage}
             onLanguageChange={onLanguageChange}
             variant="compact"
           />
+
+          <button
+            onClick={() => handleNav('dashboard')}
+            className="hidden sm:inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold shadow-md shadow-blue-500/20 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+          >
+            <span>Try Now</span>
+            <span className="text-blue-200">→</span>
+          </button>
 
           {/* Mobile Menu Button */}
           <button

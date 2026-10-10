@@ -19,7 +19,8 @@ import {
   HeartHandshake,
   HelpCircle,
   Eye,
-  BookOpen
+  BookOpen,
+  ChevronDown
 } from 'lucide-react';
 import { SupportedLanguage, SUPPORTED_LANGUAGES } from '../../types/medscript';
 import { KrishXTattvaAvatar } from '../KrishXTattvaAvatar';
@@ -98,6 +99,147 @@ const DEMO_SAMPLES = {
       pa: "ਤੁਹਾਡਾ ਬਿਜਲੀ ਦਾ ਬਿੱਲ ੧੮੪ ਯੂਨਿਟਾਂ ਦਾ ਕੁੱਲ ੭੪੨ ਰੁਪਏ ਹੈ। ਭਰਨ ਦੀ ਆਖ਼ਰੀ ਮਿਤੀ ੧੫ ਅਕਤੂਬਰ ੨੦੨೬ ਹੈ।",
       ur: "آپ کا بجلی کا بل 184 یونٹ کا کل 742 روپے ہے۔ ادائیگی کی آخری تاریخ 15 اکتوبر 2026 ہے۔"
     } as Record<string, string>
+  },
+  hepatitis: {
+    id: 'sample-hepatitis',
+    type: 'utility' as const, // For rendering compatibility
+    title: 'Metropolis Healthcare — Diagnostic Pathology',
+    patient: 'Mr. Rajeev Verma (Age: 38) • Viral Serology Panel',
+    originalOcrText: [
+      'Investigation: HBsAg (Hepatitis B Surface Antigen)',
+      'Methodology: Chemiluminescent Microparticle Immunoassay (CMIA)',
+      'Observed Value: 0.35 S/CO',
+      'Biological Reference Interval: < 0.90 S/CO (Non-Reactive)',
+      'Final Verified Status: NON-REACTIVE / NEGATIVE',
+      'Clinical Interpretation: No active Hepatitis B virus detected.'
+    ],
+    items: [
+      { label: 'Observed HBsAg Index', val: '0.35 S/CO', highlight: true },
+      { label: 'Reference Cutoff Limit', val: '< 0.90 S/CO (Non-Reactive)', highlight: false },
+      { label: 'Verified Status', val: 'NON-REACTIVE (Negative)', highlight: true },
+      { label: 'Prescription Medicines Needed', val: '0 (None Required)', highlight: false }
+    ],
+    warning: 'Non-Reactive indicates no active Hepatitis B infection. Zero daily medications are required for this diagnostic test.',
+    spokenScripts: {
+      en: "Your Hepatitis B surface antigen test result is 0.35 S/CO, which is Non-Reactive and Negative. This confirms no active infection. No medicines are needed.",
+      te: "మీ హెపటైటిస్ బి పరీక్ష ఫలితం 0.35 S/CO, ఇది నాన్-రియాక్టివ్ మరియు నెగటివ్. ఎటువంటి క్రియాశీల ఇన్ఫెక్షన్ లేదు. మందులు అవసరం లేదు.",
+      hi: "आपकी हेपेटाइटिस बी जांच रिपोर्ट 0.35 S/CO है, जो नॉन-रिएक्टिव और नेगेटिव है। शरीर में कोई सक्रिय संक्रमण नहीं है। किसी दवा की आवश्यकता नहीं है।",
+      ta: "உங்கள் ஹெபடைடிஸ் பி சோதனை முடிவு 0.35 S/CO ஆகும், இது எதிர்மறையானது (நெகட்டிவ்). வைரஸ் தொற்று இல்லை. மருந்துகள் தேவையில்லை.",
+      kn: "ನಿಮ್ಮ ಹೆಪಟೈಟಿಸ್ ಬಿ ಪರೀಕ್ಷೆಯ ಫಲಿತಾಂಶ 0.35 S/CO ಆಗಿದ್ದು, ಇದು ನಾನ್-ರಿಯಾಕ್ಟಿವ್ ಮತ್ತು ನೆಗೆಟಿವ್ ಆಗಿದೆ. ಯಾವುದೇ ಸೋಂಕು ಇಲ್ಲ. ಔಷಧಿಗಳ ಅಗತ್ಯವಿಲ್ಲ.",
+      ml: "നിങ്ങളുടെ ഹെപ്പറ്റൈറ്റിസ് ബി പരിശോധനാ ഫലം 0.35 S/CO ആണ്, ഇത് നെഗറ്റീവ് ആണ്. സജീവമായ അണുബാധയില്ല. മരുന്നുകൾ ആവശ്യമില്ല.",
+      bn: "আপনার হেপাটাইটিস বি পরীক্ষার ফলাফল ০.৩৫ S/CO, যা নন-রিঅ্যাকটিভ এবং নেগেটিভ। শরীরে কোনো সংক্রমণ নেই। ওষুধের প্রয়োজন নেই।",
+      mr: "तुमचा हिपॅटायटीस बी चाचणी निकाल ०.३५ S/CO आहे, जो नॉन-रिअॅक्टिव्ह आणि निगेटिव्ह आहे. कोणताही संसर्ग नाही. औषधांची गरज नाही.",
+      gu: "તમારો હેપેટાઇટિસ બી રિપોર્ટ ૦.૩૫ S/CO છે, જે નોન-રિએક્ટિવ અને નેગેટિવ છે. કોઈ ચેપ નથી. દવાની જરૂર નથી.",
+      pa: "ਤੁਹਾਡਾ ਹੈਪੇਟਾਈਟਿਸ ਬੀ ਟੈਸਟ ੦.੩੫ S/CO ਹੈ, ਜੋ ਕਿ ਨੈਗੇਟਿਵ ਹੈ। ਕੋਈ ਲਾਗ ਨਹੀਂ ਹੈ। ਦਵਾਈ ਦੀ ਲੋੜ ਨਹੀਂ ਹੈ।",
+      ur: "آپ کا ہیپاٹائٹس بی ٹیسٹ رزلٹ 0.35 S/CO ہے، جو کہ نان ری ایکٹیو اور منفی ہے۔ کوئی فعال انفیکشن نہیں ہے۔"
+    } as Record<string, string>
+  }
+};
+
+// Floating Tablet Screen Translations (From Reference Image)
+export const TABLET_TRANSLATIONS: Record<string, {
+  header: string;
+  items: string[];
+  spoken: string;
+}> = {
+  ta: {
+    header: 'மருத்துவக் குறிப்புகள்',
+    items: [
+      'இந்த மருந்தை நாளில் 2 முறை எடுக்கவும்.',
+      'உணவுக்குப் பிறகு எடுத்துக்கொள்ளவும்.',
+      '7 நாட்கள் தொடர்ந்தால் போதும்.'
+    ],
+    spoken: 'மருத்துவக் குறிப்புகள். இந்த மருந்தை நாளில் இரண்டு முறை உணவுக்குப் பிறகு எடுத்துக்கொள்ளவும். ஏழு நாட்கள் தொடர்ந்தால் போதும்.'
+  },
+  te: {
+    header: 'వైద్య సూచనలు',
+    items: [
+      'ఈ మందును రోజుకు 2 సార్లు వేసుకోండి.',
+      'భోజనం తర్వాత మాత్రమే తీసుకోవాలి.',
+      '7 రోజుల పాటు క్రమం తప్పకుండా వాడండి.'
+    ],
+    spoken: 'వైద్య సూచనలు. ఈ మందును రోజుకు రెండు సార్లు భోజనం తర్వాత మాత్రమే తీసుకోవాలి. ఏడు రోజుల పాటు క్రమం తప్పకుండా వాడండి.'
+  },
+  hi: {
+    header: 'दवा की पर्ची व निर्देश',
+    items: [
+      'यह दवा दिन में 2 बार लें।',
+      'भोजन के बाद ही दवा का सेवन करें।',
+      '7 दिनों तक लगातार कोर्स पूरा करें।'
+    ],
+    spoken: 'दवा की पर्ची व निर्देश. यह दवा दिन में दो बार भोजन के बाद ही लें। सात दिनों तक लगातार कोर्स पूरा करें।'
+  },
+  en: {
+    header: 'Medical Notes & Directions',
+    items: [
+      'Take this medicine 2 times a day.',
+      'Always take after meals with water.',
+      'Continue for 7 days as prescribed.'
+    ],
+    spoken: 'Medical Notes. Take this medicine two times a day after meals with water. Continue for seven days as prescribed.'
+  },
+  kn: {
+    header: 'ವೈದ್ಯಕೀಯ ಟಿಪ್ಪಣಿಗಳು',
+    items: [
+      'ಈ ಔಷಧಿಯನ್ನು ದಿನಕ್ಕೆ 2 ಬಾರಿ ತೆಗೆದುಕೊಳ್ಳಿ.',
+      'ಊಟದ ನಂತರ ಮಾತ್ರ ತೆಗೆದುಕೊಳ್ಳಬೇಕು.',
+      '7 ದಿನಗಳ ಕಾಲ ಕೋರ್ಸ್ ಪೂರ್ಣಗೊಳಿಸಿ.'
+    ],
+    spoken: 'ವೈದ್ಯಕೀಯ ಟಿಪ್ಪಣಿಗಳು. ಈ ಔಷಧಿಯನ್ನು ದಿನಕ್ಕೆ ಎರಡು ಬಾರಿ ಊಟದ ನಂತರ ತೆಗೆದುಕೊಳ್ಳಿ. ಏಳು ದಿನಗಳ ಕಾಲ ಪೂರ್ಣಗೊಳಿಸಿ.'
+  },
+  ml: {
+    header: 'ചികിത്സാ നിർദ്ദേശങ്ങൾ',
+    items: [
+      'ഈ മരുന്ന് ദിവസത്തിൽ 2 തവണ കഴിക്കുക.',
+      'ഭക്ഷണത്തിന് ശേഷം മാത്രം കഴിക്കുക.',
+      '7 ദിവസം കൃത്യമായി തുടരുക.'
+    ],
+    spoken: 'ചികിത്സാ നിർദ്ദേശങ്ങൾ. ഈ മരുന്ന് ദിവസത്തിൽ രണ്ട് തവണ ഭക്ഷണത്തിന് ശേഷം കഴിക്കുക. ഏഴ് ദിവസം തുടരുക.'
+  },
+  bn: {
+    header: 'চিকিৎসকের প্রেসক্রিপশন নির্দেশিকা',
+    items: [
+      'এই ওষুধটি দিনে ২ বার গ্রহণ করুন।',
+      'খাবারের পরে জল দিয়ে সেবন করুন।',
+      '৭ দিন পর্যন্ত এই নিয়ম বজায় রাখুন।'
+    ],
+    spoken: 'চিকিৎসকের প্রেসক্রিপশন নির্দেশিকা. এই ওষুধটি দিনে দুই বার খাবারের পরে সেবন করুন। সাত দিন বজায় রাখুন।'
+  },
+  mr: {
+    header: 'वैद्यकीय सूचना व औषधे',
+    items: [
+      'हे औषध दिवसातून २ वेळा घ्या.',
+      'जेवणानंतरच औषध घ्यावे.',
+      '७ दिवस कोर्स पूर्ण करा.'
+    ],
+    spoken: 'वैद्यकीय सूचना व औषधे. हे औषध दिवसातून दोन वेळा जेवणानंतर घ्या. सात दिवस कोर्स पूर्ण करा.'
+  },
+  gu: {
+    header: 'તબીબી સલાહ અને દવાઓ',
+    items: [
+      'આ દવા દિવસમાં ૨ વખત લો.',
+      'જમ્યા પછી જ દવા લેવી.',
+      '૭ દિવસ સુધી કોર્સ ચાલુ રાખો.'
+    ],
+    spoken: 'તબીબી સલાહ અને દવાઓ. આ દવા દિવસમાં બે વખત જમ્યા પછી લો. સાત દિવસ સુધી ચાલુ રાખો.'
+  },
+  pa: {
+    header: 'ਡਾਕਟਰੀ ਹਦਾਇਤਾਂ ਤੇ ਦਵਾਈਆਂ',
+    items: [
+      'ਇਹ ਦਵਾਈ ਦਿਨ ਵਿੱਚ ੨ ਵਾਰ ਲਵੋ।',
+      'ਖਾਣਾ ਖਾਣ ਤੋਂ ਬਾਅਦ ਹੀ ਲਵੋ।',
+      '੭ ਦਿਨਾਂ ਤੱਕ ਕੋਰਸ ਪੂਰਾ ਕਰੋ।'
+    ],
+    spoken: 'ਡਾਕਟਰੀ ਹਦਾਇਤਾਂ. ਇਹ ਦਵਾਈ ਦਿਨ ਵਿੱਚ ਦੋ ਵਾਰ ਖਾਣਾ ਖਾਣ ਤੋਂ ਬਾਅਦ ਲਵੋ। ਸੱਤ ਦਿਨਾਂ ਤੱਕ ਪੂਰਾ ਕਰੋ।'
+  },
+  ur: {
+    header: 'طبی ہدایات اور نسخہ',
+    items: [
+      'یہ دوا دن میں 2 بار لیں۔',
+      'کھانے کے بعد ہی دوا لیں۔',
+      '7 دن تک باقاعدگی سے استعمال کریں۔'
+    ],
+    spoken: 'طبی ہدایات. یہ دوا دن میں دو بار کھانے کے بعد لیں۔ سات دن تک باقاعدگی سے استعمال کریں۔'
   }
 };
 
@@ -109,13 +251,21 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
 }) => {
   const t = getUITranslation(currentLanguage);
 
-  // Live Demo Playground State
-  const [activeDemoTab, setActiveDemoTab] = useState<'prescription' | 'utility'>('prescription');
+  // Live Demo Playground State (Hepatitis Lab Report, Prescription, Utility Bill)
+  const [activeDemoTab, setActiveDemoTab] = useState<'hepatitis' | 'prescription' | 'utility'>('hepatitis');
   const [isPlayingDemoVoice, setIsPlayingDemoVoice] = useState(false);
+  const [isPlayingTabletVoice, setIsPlayingTabletVoice] = useState(false);
+  const [showTabletLangMenu, setShowTabletLangMenu] = useState(false);
+  const [activeTabletLang, setActiveTabletLang] = useState<SupportedLanguage>(currentLanguage);
   const [demoSubtitle, setDemoSubtitle] = useState<string>('');
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
   const [langToast, setLangToast] = useState<{ show: boolean; name: string } | null>(null);
   const prevLangRef = useRef(currentLanguage);
+
+  // Keep tablet language synced with main language
+  useEffect(() => {
+    setActiveTabletLang(currentLanguage);
+  }, [currentLanguage]);
 
   // Trigger brief delightful toast when language changes
   useEffect(() => {
@@ -191,13 +341,46 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
     );
   };
 
+  // Handle Floating Luminous Tablet Voice Playback
+  const handleToggleTabletSpeech = () => {
+    if (isPlayingTabletVoice) {
+      speechManager.stop();
+      setIsPlayingTabletVoice(false);
+    } else {
+      speechManager.stop();
+      setIsPlayingDemoVoice(false);
+      setIsPlayingTabletVoice(true);
+      const tabletData = TABLET_TRANSLATIONS[activeTabletLang] || TABLET_TRANSLATIONS.ta || TABLET_TRANSLATIONS.en;
+      speechManager.speakScript(
+        tabletData.spoken,
+        activeTabletLang,
+        {
+          onStart: () => setIsPlayingTabletVoice(true),
+          onEnd: () => setIsPlayingTabletVoice(false),
+          onError: () => setIsPlayingTabletVoice(false)
+        },
+        1.0
+      );
+    }
+  };
+
+  const handleSelectTabletLang = (langCode: SupportedLanguage) => {
+    setActiveTabletLang(langCode);
+    setShowTabletLangMenu(false);
+    onLanguageChange(langCode);
+    if (isPlayingTabletVoice) {
+      speechManager.stop();
+      setIsPlayingTabletVoice(false);
+    }
+  };
+
   return (
-    <div className="w-full flex flex-col bg-gradient-to-b from-[#f0fdfa]/60 via-[#f8fafc] to-white text-slate-900 overflow-x-hidden relative">
+    <div className="w-full flex flex-col bg-gradient-to-b from-[#f0f9ff]/70 via-[#f8fafc] to-white text-slate-900 overflow-x-hidden relative">
       
       {/* Floating Language Switched Feedback Toast */}
       {langToast && (
-        <div className="fixed top-20 right-4 sm:right-8 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-teal-700 to-emerald-700 text-white shadow-xl shadow-teal-900/20 border border-teal-400/30 animate-in fade-in slide-in-from-top-4 duration-200">
-          <Sparkles className="w-4 h-4 text-teal-200 animate-spin" />
+        <div className="fixed top-20 right-4 sm:right-8 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-blue-700 to-indigo-700 text-white shadow-xl shadow-blue-900/20 border border-blue-400/30 animate-in fade-in slide-in-from-top-4 duration-200">
+          <Sparkles className="w-4 h-4 text-blue-200 animate-spin" />
           <span className="text-xs font-bold">
             Translated whole page to {langToast.name} ✨
           </span>
@@ -205,199 +388,307 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
       )}
 
       {/* =========================================================================
-          SECTION 1: HERO SECTION (WARM SUNLIT CLINIC DESK THEME & 3D MASCOT)
+          SECTION 1: PEACEFUL, SUNLIT COVERPAGE HERO (FROM REFERENCE IMAGE)
+          "From Confusing Documents to Clear Understanding"
           ========================================================================= */}
-      <section className="relative w-full pt-8 sm:pt-12 pb-14 sm:pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section className="relative w-full bg-[#f4f9fd] overflow-hidden pt-2 pb-10 sm:pb-14 px-3 sm:px-6 lg:px-8">
         
-        {/* Soft Background Radial Light & Aura */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[550px] bg-gradient-to-tr from-teal-200/35 via-emerald-100/25 to-sky-100/40 rounded-full blur-3xl pointer-events-none -z-10" />
+        {/* Soft Ambient Morning Sunbeam Light */}
+        <div className="absolute top-0 left-1/4 -translate-x-1/2 w-[700px] h-[450px] bg-gradient-to-tr from-amber-100/40 via-sky-100/50 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          
-          {/* Left Hero Column: Headline, Subtitle, Floating Badges & CTAs */}
-          <div key={`hero-${currentLanguage}`} className="lg:col-span-7 flex flex-col items-start text-left space-y-6 z-10 lang-switch-animate">
+        <div className="max-w-[1240px] mx-auto w-full">
+
+          {/* DESKTOP / TABLET HERO COVER CANVAS (High-Fidelity Widescreen Scene with Live Working Controls) */}
+          <div className="hidden md:block relative w-full rounded-3xl overflow-hidden shadow-2xl shadow-sky-900/10 border border-sky-100 bg-[#eaf4fd]">
             
-            {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold tracking-wide shadow-2xs">
-              <span className="w-2.5 h-2.5 rounded-full bg-teal-500 animate-pulse" />
-              <span>{t.heroBadge}</span>
-              <span className="text-teal-400">•</span>
-              <span className="text-teal-700 font-medium">11 Languages Active</span>
-            </div>
+            {/* The Visual Scene Artwork */}
+            <img 
+              src="/cover_hero_scene.jpg" 
+              alt="DocuEase Cover: From Confusing Documents to Clear Understanding"
+              className="w-full h-auto object-cover select-none pointer-events-none block"
+            />
 
-            {/* Main Headline */}
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
-              {t.heroHeadlinePrefix}{' '}
-              <span className="shimmer-teal underline decoration-teal-300 decoration-wavy decoration-2">
-                {t.heroHeadlineHighlight}
-              </span>
-            </h1>
+            {/* LIVE WORKING HOTSPOT: Try Now Button (Matches Reference Coordinates) */}
+            <button
+              onClick={onGetStarted}
+              className="absolute left-[6.1%] top-[39.2%] w-[12.2%] h-[6.8%] min-h-[38px] rounded-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] hover:from-[#4f46e5] hover:to-[#4338ca] text-white font-bold text-xs lg:text-sm tracking-wide shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 group cursor-pointer z-20"
+              title="Try DocuEase AI Now"
+            >
+              <span>Try Now</span>
+              <span className="text-indigo-200 group-hover:translate-x-0.5 transition-transform">→</span>
+            </button>
 
-            {/* Clear Supporting Text */}
-            <p className="text-slate-600 text-base sm:text-lg lg:text-xl leading-relaxed max-w-xl font-normal">
-              {t.heroSubtitle}
-            </p>
+            {/* LIVE WORKING FLOATING LUMINOUS TABLET (Positioned directly over tablet in artwork) */}
+            <div 
+              className="absolute left-[59.3%] top-[20.8%] w-[25.8%] h-[40.8%] bg-white/95 backdrop-blur-md rounded-2xl lg:rounded-3xl border-2 border-sky-200/90 shadow-[0_8px_30px_rgba(56,189,248,0.22)] p-2.5 sm:p-3 lg:p-4 flex flex-col justify-between z-20 transition-all hover:shadow-[0_12px_36px_rgba(56,189,248,0.32)]"
+            >
+              {/* Tablet Top Bar: Document Icon + "Converted to your language" + Language Dropdown */}
+              <div className="flex items-center justify-between gap-1 border-b border-slate-100 pb-1.5 sm:pb-2">
+                <div className="flex items-center gap-1.5 overflow-hidden">
+                  <div className="w-5 h-5 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                    <FileText className="w-3 h-3 text-blue-600" />
+                  </div>
+                  <span className="text-[10px] sm:text-[11px] lg:text-xs font-bold text-slate-700 truncate">
+                    Converted to your language
+                  </span>
+                </div>
 
-            {/* Quick Language Capsules (All 11 Languages - Click for instant whole-site translation) */}
-            <div className="flex flex-col gap-2 pt-1 max-w-2xl w-full">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <Globe2 className="w-3.5 h-3.5 text-teal-600" />
-                  <span>Choose Your Language:</span>
-                </span>
-                <span className="text-[11px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100">
-                  Instant whole page update
-                </span>
+                {/* Interactive Language Dropdown Button */}
+                <div className="relative shrink-0">
+                  <button
+                    onClick={() => setShowTabletLangMenu(!showTabletLangMenu)}
+                    className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-[10px] sm:text-xs font-bold transition-colors cursor-pointer"
+                    title="Change Tablet Language"
+                  >
+                    <span>
+                      {SUPPORTED_LANGUAGES.find(l => l.code === activeTabletLang)?.nativeName || 'Tamil'}
+                    </span>
+                    <ChevronDown className={`w-3 h-3 text-sky-600 transition-transform ${showTabletLangMenu ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Dropdown Menu (All 11 Indian Languages) */}
+                  {showTabletLangMenu && (
+                    <div className="absolute right-0 top-full mt-1 w-44 max-h-56 overflow-y-auto bg-white rounded-xl shadow-2xl border border-slate-200 py-1 z-50 text-left">
+                      <div className="px-2.5 py-1 text-[9px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                        Choose Language
+                      </div>
+                      {SUPPORTED_LANGUAGES.map((lang) => (
+                        <button
+                          key={lang.code}
+                          onClick={() => handleSelectTabletLang(lang.code)}
+                          className={`w-full text-left px-2.5 py-1.5 text-xs flex items-center justify-between hover:bg-sky-50 transition-colors ${
+                            activeTabletLang === lang.code ? 'font-bold text-sky-700 bg-sky-50/70' : 'text-slate-700'
+                          }`}
+                        >
+                          <span>{lang.nativeName}</span>
+                          <span className="text-[10px] text-slate-400">{lang.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                {SUPPORTED_LANGUAGES.map(langObj => {
-                  const isSelected = currentLanguage === langObj.code;
-                  return (
-                    <button
-                      key={langObj.code}
-                      onClick={() => onLanguageChange(langObj.code)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all transform hover:scale-105 active:scale-95 flex items-center gap-1 ${
-                        isSelected
-                          ? 'bg-teal-700 text-white shadow-md shadow-teal-700/20 ring-2 ring-teal-400/50'
-                          : 'bg-white/90 text-slate-700 border border-slate-200/90 hover:border-teal-300 hover:text-teal-800 hover:bg-teal-50/50 shadow-2xs'
+
+              {/* Tablet Content: Title in Selected Language */}
+              <div className="my-auto py-1">
+                <h3 className="text-xs sm:text-sm lg:text-base font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-1">
+                  {TABLET_TRANSLATIONS[activeTabletLang]?.header || TABLET_TRANSLATIONS.ta.header}
+                </h3>
+
+                {/* 3 Bullet Points with Emerald Checkmarks */}
+                <div className="mt-1 sm:mt-1.5 space-y-1 sm:space-y-1.5 text-[9px] sm:text-[10px] lg:text-xs text-slate-700 font-medium">
+                  {(TABLET_TRANSLATIONS[activeTabletLang]?.items || TABLET_TRANSLATIONS.ta.items).map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-1.5 leading-tight">
+                      <div className="w-3.5 h-3.5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-[9px] font-bold">✓</span>
+                      </div>
+                      <span className="line-clamp-1">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tablet Bottom: Working Audio Waveform Player Bar */}
+              <div className="pt-1.5 sm:pt-2 border-t border-slate-100 flex items-center gap-2">
+                {/* Play / Pause Circular Button */}
+                <button
+                  onClick={handleToggleTabletSpeech}
+                  className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md shadow-blue-600/30 transition-transform hover:scale-105 active:scale-95 shrink-0 cursor-pointer"
+                  title={isPlayingTabletVoice ? 'Pause Audio' : 'Play Spoken Audio in this Language'}
+                >
+                  {isPlayingTabletVoice ? (
+                    <Pause className="w-3 h-3 lg:w-3.5 lg:h-3.5 fill-white" />
+                  ) : (
+                    <Play className="w-3 h-3 lg:w-3.5 lg:h-3.5 fill-white ml-0.5" />
+                  )}
+                </button>
+
+                {/* 16 Animated Waveform Equalizer Bars */}
+                <div className="flex-1 flex items-center justify-center gap-0.5 sm:gap-1 h-5 sm:h-6 px-1">
+                  {[35, 60, 85, 45, 95, 75, 40, 90, 65, 80, 50, 95, 70, 45, 85, 60].map((h, i) => (
+                    <span
+                      key={i}
+                      className={`w-0.5 sm:w-1 rounded-full transition-all duration-150 ${
+                        isPlayingTabletVoice ? 'bg-blue-600' : 'bg-blue-400/50'
                       }`}
-                      title={`Switch entire page to ${langObj.name}`}
-                    >
-                      <span>{langObj.nativeName}</span>
-                      {isSelected && <span className="text-[10px]">✓</span>}
-                    </button>
-                  );
-                })}
+                      style={{
+                        height: isPlayingTabletVoice 
+                          ? `${Math.max(20, (h * (0.5 + 0.5 * Math.sin(Date.now() / 250 + i * 0.8))))}%` 
+                          : `${Math.max(20, h * 0.45)}%`,
+                        transition: 'height 0.15s ease-in-out'
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Speaker Icon with Active Sound Waves */}
+                <div 
+                  onClick={handleToggleTabletSpeech}
+                  className="cursor-pointer text-slate-500 hover:text-blue-600 transition-colors shrink-0" 
+                  title="Toggle Audio Voice"
+                >
+                  <Volume2 className={`w-3.5 h-3.5 lg:w-4 lg:h-4 ${isPlayingTabletVoice ? 'text-blue-600 animate-pulse' : 'text-slate-400'}`} />
+                </div>
               </div>
+
             </div>
 
-            {/* Primary Action Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-3 w-full sm:w-auto">
-              <button
-                onClick={onGetStarted}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold text-base shadow-lg shadow-teal-800/25 hover:shadow-xl hover:shadow-teal-800/35 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
-              >
-                <span>{t.navGetStarted}</span>
-                <ArrowRight className="w-5 h-5 text-teal-200" />
-              </button>
+            {/* LIVE WORKING HOTSPOTS: 4 Bottom Feature Cards */}
+            {/* Card 1: Upload Document */}
+            <div
+              onClick={onGetStarted}
+              className="absolute left-[8.5%] top-[74%] w-[14.5%] h-[24%] rounded-2xl cursor-pointer hover:bg-sky-500/10 transition-colors z-20"
+              title="Upload PDF, image or handwritten prescriptions"
+            />
 
-              <button
-                onClick={scrollToDemo}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-white hover:bg-teal-50/80 text-teal-800 font-bold text-base border-2 border-teal-200/90 shadow-sm hover:border-teal-400 transition-all transform hover:-translate-y-0.5"
-              >
-                <Eye className="w-5 h-5 text-teal-600" />
-                <span>{t.btnTryLiveDemo}</span>
-              </button>
+            {/* Card 2: Translate Instantly */}
+            <div
+              onClick={() => setShowTabletLangMenu(true)}
+              className="absolute left-[26.5%] top-[74%] w-[14.5%] h-[24%] rounded-2xl cursor-pointer hover:bg-sky-500/10 transition-colors z-20"
+              title="Choose your preferred language"
+            />
 
-              <button
-                onClick={scrollToSteps}
-                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-4 text-sm font-bold text-slate-600 hover:text-teal-700 transition-colors"
-              >
-                <span>{t.btnHowItWorks}</span>
-                <span className="text-teal-500">↓</span>
-              </button>
-            </div>
+            {/* Card 3: Get Simple Explanation */}
+            <div
+              onClick={scrollToDemo}
+              className="absolute left-[44.5%] top-[74%] w-[14.5%] h-[24%] rounded-2xl cursor-pointer hover:bg-sky-500/10 transition-colors z-20"
+              title="AI converts complex text into easy language"
+            />
 
-            {/* Trust Highlights */}
-            <div className="grid grid-cols-3 gap-3 w-full max-w-lg pt-2 border-t border-slate-200/70">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-                <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
-                <span>{t.statZeroGuesswork}</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-                <Globe2 className="w-4 h-4 text-teal-600 shrink-0" />
-                <span>{t.stat11Languages}</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{t.statVerifiedSafe}</span>
-              </div>
-            </div>
+            {/* Card 4: In Any Language */}
+            <div
+              onClick={() => setShowTabletLangMenu(true)}
+              className="absolute left-[62.5%] top-[74%] w-[14.5%] h-[24%] rounded-2xl cursor-pointer hover:bg-sky-500/10 transition-colors z-20"
+              title="From local to global, we've got you covered"
+            />
 
           </div>
 
-          {/* Right Hero Column: 3D Robot Doctor Mascot with Floating Document Cards & Desk Accents */}
-          <div className="lg:col-span-5 relative flex items-center justify-center">
+          {/* MOBILE HERO COVER SECTION (Responsive Fallback for Phones) */}
+          <div className="md:hidden flex flex-col space-y-6 pt-4">
             
-            {/* Sticky Note 1: "Small Steps, Big Clarity" (Inspired by Reference Image) */}
-            <div className="absolute -top-8 -left-6 hidden xl:flex flex-col p-2.5 bg-[#fef9c3] rounded-xl border border-yellow-300 shadow-md transform -rotate-3 text-[11px] font-bold text-yellow-950 sticky-note-shadow animate-float-slow z-20">
-              <div className="w-2.5 h-2.5 rounded-full bg-rose-400 mx-auto -mt-3.5 mb-1 shadow-2xs border border-white" />
-              <span>{t.tagSmallSteps}</span>
+            {/* Mobile Header & Text */}
+            <div className="text-left space-y-3">
+              <span className="inline-block px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-[11px] font-bold">
+                ✨ Documents Made Simple
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                From Confusing Documents to Clear Understanding
+              </h1>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Upload. Translate. Understand. AI turns complex documents into simple language — in the language you choose.
+              </p>
+              <div className="pt-2">
+                <button
+                  onClick={onGetStarted}
+                  className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] text-white font-bold text-sm shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2"
+                >
+                  <span>Try Now</span>
+                  <span>→</span>
+                </button>
+              </div>
             </div>
 
-            {/* Sticky Note 2: "Docs → Simple Words" (Inspired by Reference Image) */}
-            <div className="absolute top-28 -left-10 hidden xl:flex flex-col p-2 bg-[#ccfbf1] rounded-xl border border-teal-300 shadow-md transform rotate-2 text-[11px] font-bold text-teal-950 sticky-note-shadow animate-float-reverse z-20">
-              <div className="w-2.5 h-2.5 rounded-full bg-teal-600 mx-auto -mt-3 mb-1 shadow-2xs border border-white" />
-              <span>{t.tagDocsToSimple}</span>
+            {/* Grandma & Little Girl Speech Bubbles */}
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="p-3 bg-purple-50/80 rounded-2xl border border-purple-200 text-purple-900">
+                <p className="font-bold text-[11px] text-purple-700">👵 Grandmother:</p>
+                <p className="italic mt-0.5">"So much text... I don't understand anything... ??"</p>
+              </div>
+              <div className="p-3 bg-amber-50/80 rounded-2xl border border-amber-200 text-amber-900">
+                <p className="font-bold text-[11px] text-amber-700">👧 Daughter:</p>
+                <p className="italic mt-0.5">"Now I understand! So easy! ♡"</p>
+              </div>
             </div>
 
-            {/* Sticky Note 3: "Understand • Translate • Feel Confident" (Inspired by Reference Image) */}
-            <div className="absolute -bottom-6 -right-6 hidden sm:flex flex-col p-2.5 bg-[#fef3c7] rounded-xl border border-amber-300 shadow-md transform -rotate-1 text-[11px] font-bold text-amber-950 sticky-note-shadow z-20">
-              <div className="w-8 h-2.5 bg-amber-200/90 -mt-3.5 mb-1 mx-auto rounded-xs opacity-80 border-t border-amber-300" />
-              <span>{t.tagFeelConfident}</span>
+            {/* Mobile Luminous Tablet with Active Voice */}
+            <div className="w-full bg-white rounded-2xl border-2 border-sky-200 shadow-xl p-4 flex flex-col space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                <span className="text-xs font-bold text-slate-700">
+                  Converted to your language
+                </span>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowTabletLangMenu(!showTabletLangMenu)}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 border border-sky-200 text-xs font-bold"
+                  >
+                    <span>{SUPPORTED_LANGUAGES.find(l => l.code === activeTabletLang)?.nativeName || 'Tamil'}</span>
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  </button>
+                  {showTabletLangMenu && (
+                    <div className="absolute right-0 top-full mt-1 w-44 max-h-48 overflow-y-auto bg-white rounded-xl shadow-xl border border-slate-200 py-1 z-50">
+                      {SUPPORTED_LANGUAGES.map((lang) => (
+                        <button
+                          key={lang.code}
+                          onClick={() => handleSelectTabletLang(lang.code)}
+                          className="w-full text-left px-3 py-1.5 text-xs hover:bg-sky-50 flex items-center justify-between"
+                        >
+                          <span>{lang.nativeName}</span>
+                          <span className="text-[10px] text-slate-400">{lang.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-900">
+                  {TABLET_TRANSLATIONS[activeTabletLang]?.header || TABLET_TRANSLATIONS.ta.header}
+                </h3>
+                <div className="mt-2 space-y-1.5 text-xs text-slate-700">
+                  {(TABLET_TRANSLATIONS[activeTabletLang]?.items || TABLET_TRANSLATIONS.ta.items).map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-2">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Audio player bar */}
+              <div className="pt-2 border-t border-slate-100 flex items-center gap-2">
+                <button
+                  onClick={handleToggleTabletSpeech}
+                  className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md"
+                >
+                  {isPlayingTabletVoice ? <Pause className="w-3.5 h-3.5 fill-white" /> : <Play className="w-3.5 h-3.5 fill-white ml-0.5" />}
+                </button>
+                <div className="flex-1 flex items-center justify-center gap-1 h-6">
+                  {[35, 60, 85, 45, 95, 75, 40, 90, 65, 80, 50, 95].map((h, i) => (
+                    <span
+                      key={i}
+                      className={`w-1 rounded-full ${isPlayingTabletVoice ? 'bg-blue-600' : 'bg-blue-300'}`}
+                      style={{ height: `${isPlayingTabletVoice ? h : h * 0.4}%` }}
+                    />
+                  ))}
+                </div>
+                <Volume2 className={`w-4 h-4 ${isPlayingTabletVoice ? 'text-blue-600 animate-pulse' : 'text-slate-400'}`} />
+              </div>
             </div>
 
-            {/* Soft Ambient Card Container */}
-            <div className="relative w-full max-w-md lg:max-w-none bg-gradient-to-b from-white/95 via-teal-50/40 to-white/90 rounded-3xl border border-teal-200/80 shadow-xl shadow-teal-900/5 p-4 sm:p-6 backdrop-blur-md flex flex-col items-center">
-              
-              {/* Floating Prescription Note (Top-Left) with float animation */}
-              <div className="absolute -top-4 -left-4 sm:-left-6 hidden sm:flex items-center gap-2.5 px-3.5 py-2 bg-white/95 rounded-2xl border border-teal-200 shadow-lg shadow-teal-900/10 animate-float-slow z-10">
-                <div className="w-7 h-7 rounded-lg bg-teal-700 text-white flex items-center justify-center font-bold text-xs shadow-xs">
-                  Rx
-                </div>
-                <div className="text-left">
-                  <p className="text-[11px] font-bold text-slate-800">Paracetamol 650mg</p>
-                  <p className="text-[9px] text-teal-700 font-semibold">1-0-1 TDS • After meals</p>
-                </div>
+            {/* Mobile 4 Feature Cards */}
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <div onClick={onGetStarted} className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs text-left cursor-pointer">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs mb-1.5">📄</div>
+                <p className="font-bold text-xs text-slate-900">Upload Document</p>
+                <p className="text-[10px] text-slate-500">PDF, image or prescriptions</p>
               </div>
-
-              {/* Floating Lab / Bill Card (Top-Right) with reverse float animation */}
-              <div className="absolute -top-3 -right-4 sm:-right-6 hidden sm:flex items-center gap-2 px-3 py-2 bg-white/95 rounded-2xl border border-emerald-200 shadow-lg shadow-emerald-900/10 animate-float-reverse z-10">
-                <div className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
-                  ⚡
-                </div>
-                <div className="text-left">
-                  <p className="text-[11px] font-bold text-slate-800">Total: ₹742.00</p>
-                  <p className="text-[9px] text-emerald-700 font-semibold">Due: 15 Oct 2026</p>
-                </div>
+              <div onClick={() => setShowTabletLangMenu(true)} className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs text-left cursor-pointer">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs mb-1.5">🌐</div>
+                <p className="font-bold text-xs text-slate-900">Translate Instantly</p>
+                <p className="text-[10px] text-slate-500">Choose preferred language</p>
               </div>
-
-              {/* 3D WebGL Mascot Canvas (DocuBot Milo) */}
-              <div className="w-full flex flex-col items-center">
-                <KrishXTattvaAvatar
-                  mood={isPlayingDemoVoice ? 'speaking' : 'greeting'}
-                  isSpeaking={isPlayingDemoVoice}
-                  activeSentence={demoSubtitle}
-                  onToggleSpeech={handleToggleDemoSpeech}
-                  onReplaySpeech={handleReplayDemoSpeech}
-                  playbackSpeed={playbackSpeed}
-                  onSpeedChange={setPlaybackSpeed}
-                  compact={false}
-                  showControls={true}
-                  language={currentLanguage}
-                  characterTitle="DocuBot (Milo)"
-                />
+              <div onClick={scrollToDemo} className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs text-left cursor-pointer">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs mb-1.5">👨‍⚕️</div>
+                <p className="font-bold text-xs text-slate-900">Get Simple Explanation</p>
+                <p className="text-[10px] text-slate-500">AI converts to easy language</p>
               </div>
-
-              {/* Clinic Study Desk Stack of Medical Books from Reference Image */}
-              <div className="w-full mt-4 pt-3 border-t border-slate-100 flex flex-col gap-1.5 px-1">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">
-                  Clinic Study Reference Desk
-                </div>
-                <div className="flex items-center justify-between text-[11px] font-bold">
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-800 text-white shadow-2xs">
-                    <BookOpen className="w-3 h-3 text-teal-200" />
-                    <span>{t.book1}</span>
-                  </div>
-                  <div className="px-2.5 py-1 rounded-lg bg-teal-600 text-white shadow-2xs">
-                    <span>{t.book2}</span>
-                  </div>
-                  <div className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white shadow-2xs">
-                    <span>{t.book3}</span>
-                  </div>
-                </div>
+              <div onClick={() => setShowTabletLangMenu(true)} className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs text-left cursor-pointer">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs mb-1.5">🇮🇳</div>
+                <p className="font-bold text-xs text-slate-900">In Any Language</p>
+                <p className="text-[10px] text-slate-500">All 11 Indian languages</p>
               </div>
-
             </div>
 
           </div>
