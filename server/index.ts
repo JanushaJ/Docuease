@@ -439,8 +439,8 @@ app.post('/api/analyze', async (req, res) => {
     const allTranslations = buildTranslations(parsedData);
     const activeTranslation = allTranslations[chosenLang] || allTranslations.en;
 
-    const spokenScript = activeTranslation.spokenScript || activeTranslation.simpleSummary;
-    const rawSentences = spokenScript.split(/(?<=[.!?।])\s+/).filter(Boolean);
+    const spokenScript = activeTranslation.spokenScript || activeTranslation.simpleSummary || '';
+    const rawSentences = spokenScript ? spokenScript.split(/(?<=[.!?।])\s+/).filter(Boolean) : [];
     const sentenceTimings = rawSentences.map((s, idx) => ({
       sentence: s,
       durationSec: Math.max(2.5, s.split(' ').length * 0.45),
@@ -479,7 +479,7 @@ app.post('/api/analyze', async (req, res) => {
         duration: m.duration || '5 days',
         timingInstructions: m.timingInstructions || 'After food',
         isLegible: m.isVerified,
-        needsPharmacistVerification: !m.isVerified || m.confidence < 70,
+        needsPharmacistVerification: !m.isVerified || (m.confidence !== null && m.confidence < 70),
         originalText: m.rawLine || m.name,
         notes: !m.isVerified ? 'Needs Pharmacist Verification' : undefined
       }));
@@ -500,9 +500,9 @@ app.post('/api/analyze', async (req, res) => {
         labBiomarkers,
         hasIllegibleText,
         unclearItemsNotes,
-        clinicalSummary: activeTranslation.originalSummary,
+        clinicalSummary: activeTranslation.originalSummary || activeTranslation.originalTextSummary || '',
         simpleExplanation: activeTranslation.simpleSummary,
-        actionItems: [activeTranslation.breakdown.whatToDo, activeTranslation.breakdown.whatToWatch].filter(Boolean),
+        actionItems: [activeTranslation.breakdown?.whatToDo, activeTranslation.breakdown?.whatToWatch].filter(Boolean) as string[],
         spokenExplanation: spokenScript,
         translatedLanguage: chosenLang
       };
@@ -537,12 +537,12 @@ app.post('/api/analyze', async (req, res) => {
       accountNumber: bill?.accountNumber || fin?.accountRef || 'Not Specified',
       billingPeriod: bill?.billingPeriod || new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
       totalAmountDue: bill?.amountDue || fin?.amountMentioned || '₹742.00',
-      dueDate: bill?.dueDate || fin?.deadline || activeTranslation.breakdown.deadline || '15 Oct 2026',
+      dueDate: bill?.dueDate || fin?.deadline || activeTranslation.breakdown?.deadline || '15 Oct 2026',
       lateFeeNotice: bill?.lateFee || 'Late payment surcharge applies after due date',
       breakdownOfFees,
-      requiredActions: [activeTranslation.breakdown.whatToDo],
+      requiredActions: [activeTranslation.breakdown?.whatToDo || 'Review document details'],
       fraudCautionNotice: fin ? 'Mandatory Anti-Fraud Notice: Never share OTP, CVV, or passwords with anyone.' : undefined,
-      summary: activeTranslation.originalSummary,
+      summary: activeTranslation.originalSummary || activeTranslation.originalTextSummary || '',
       simpleExplanation: activeTranslation.simpleSummary,
       spokenExplanation: spokenScript,
       translatedLanguage: chosenLang
@@ -806,7 +806,7 @@ What to watch: ${doc.explanation.breakdown?.whatToWatch || ''}`;
     // If Gemini was offline or unavailable, synthesize localized explanation for target language
     if (!client && targetLang !== 'en') {
       const categoryLabel = doc.detectedCategoryLabel || doc.type || 'Document';
-      const greetings: Record<SupportedLanguage, { greet: string; desc: string; advice: string }> = {
+      const greetings: Partial<Record<SupportedLanguage, { greet: string; desc: string; advice: string }>> = {
         en: {
           greet: 'Hello! I am your KrishBuddy assistant.',
           desc: `This document is classified as ${categoryLabel}. Here is what was extracted: `,
@@ -935,7 +935,7 @@ app.post(['/api/speech', '/api/documents/speech', '/api/documents/:id/speak'], (
 
     if (sentenceTimings.length === 0) {
       const sentences = spokenScript.split(/(?<=[.!?।])\s+/).filter(Boolean);
-      sentenceTimings = sentences.map((s, idx) => ({
+      sentenceTimings = sentences.map((s: string, idx: number) => ({
         sentence: s,
         durationSec: Math.max(2.5, s.split(' ').length * 0.4),
         audioStartTime: idx * 3.5,
@@ -1200,7 +1200,7 @@ Provide a concise, helpful answer in plain language:`;
     };
 
     if (targetId) {
-      try { saveChatMessage(targetId, chatMsg); } catch { /* */ }
+      try { saveChatMessage(chatMsg, targetId); } catch { /* */ }
     }
 
     res.json({
@@ -1246,7 +1246,7 @@ app.get('/api/documents', (_req, res) => {
 });
 
 app.get(['/api/documents/:id', '/api/documents/:id/results'], (req, res) => {
-  const id = req.params.id;
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const doc = documentCache.get(id) || getDocumentFromDb(id);
   if (doc) {
     return res.json({ success: true, document: doc });

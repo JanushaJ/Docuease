@@ -771,7 +771,7 @@ Dr. B.K. Singh`;
     },
     serviceConfigured: true,
     get explanation(): DocumentExplanation {
-      return this.translations[this.selectedLanguage] || this.translations.en;
+      return (this.translations[this.selectedLanguage] || this.translations.en)!;
     }
   };
 }
@@ -1327,7 +1327,7 @@ Advice:
     },
     serviceConfigured: true,
     get explanation(): DocumentExplanation {
-      return this.translations[this.selectedLanguage] || this.translations.en;
+      return (this.translations[this.selectedLanguage] || this.translations.en)!;
     }
   };
 }
@@ -1967,7 +1967,7 @@ export const DEMO_DOCUMENTS: ProcessedDocument[] = [
     },
     serviceConfigured: true,
     get explanation(): DocumentExplanation {
-      return this.translations[this.selectedLanguage] || this.translations.en;
+      return (this.translations[this.selectedLanguage] || this.translations.en)!;
     }
   },
 
@@ -2373,7 +2373,7 @@ export const DEMO_DOCUMENTS: ProcessedDocument[] = [
     },
     serviceConfigured: true,
     get explanation(): DocumentExplanation {
-      return this.translations[this.selectedLanguage] || this.translations.en;
+      return (this.translations[this.selectedLanguage] || this.translations.en)!;
     }
   },
 
@@ -2757,7 +2757,7 @@ export const DEMO_DOCUMENTS: ProcessedDocument[] = [
     },
     serviceConfigured: true,
     get explanation(): DocumentExplanation {
-      return this.translations[this.selectedLanguage] || this.translations.en;
+      return (this.translations[this.selectedLanguage] || this.translations.en)!;
     }
   },
   getHepatitisDocument(),

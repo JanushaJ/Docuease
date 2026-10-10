@@ -11,7 +11,7 @@ import { ExtractedOcrResult } from './realOcr';
  * Builds dynamic multilingual explanations strictly from the real OCR results.
  * Strictly preserves medicine names, numbers, dosage values, and clinical terms.
  */
-export function buildUnverifiedSpeechExplanations(): Record<SupportedLanguage, DocumentExplanation> {
+export function buildUnverifiedSpeechExplanations(): Partial<Record<SupportedLanguage, DocumentExplanation>> {
   const unverifiedScriptEn = "I could not reliably read any verified information from this document.";
   const unverifiedScriptTa = "இந்த ஆவணத்தில் இருந்து சரிபார்க்கப்பட்ட எந்த தகவலையும் என்னால் நம்பகத்தன்மையுடன் படிக்க முடியவில்லை.";
   const unverifiedScriptTe = "ఈ పత్రం నుండి ధృవీకరించబడిన ఎలాంటి సమాచారాన్ని నేను ఖచ్చితంగా చదవలేకపోయాను.";
@@ -73,7 +73,7 @@ export function buildUnverifiedSpeechExplanations(): Record<SupportedLanguage, D
 export function buildLabReportExplanations(
   ocr: ExtractedOcrResult,
   tokens: OCRToken[]
-): Record<SupportedLanguage, DocumentExplanation> {
+): Partial<Record<SupportedLanguage, DocumentExplanation>> {
   const labResults = ocr.labResults || [];
   const primaryResult = labResults[0];
 
@@ -263,7 +263,7 @@ export function buildLabReportExplanations(
 export function buildDynamicMultilingualExplanations(
   ocr: ExtractedOcrResult,
   tokens: OCRToken[]
-): Record<SupportedLanguage, DocumentExplanation> {
+): Partial<Record<SupportedLanguage, DocumentExplanation>> {
   const structuredMeds = ocr.structuredMeds || [];
   const verifiedStructuredMeds = structuredMeds.filter(m => m.isVerified || m.verificationStatus === 'VERIFIED');
   const medNames = verifiedStructuredMeds.map(m => m.name).filter(Boolean);

@@ -450,7 +450,7 @@ All items have been verified directly from what was visible on the prescription.
   }
 
   // Fallback grounded answer
-  const summary = doc.translations[detectedLang]?.simpleSummary || doc.explanation.simpleSummary;
+  const summary = doc.translations[detectedLang]?.simpleSummary || doc.explanation.simpleSummary || 'Document summary unavailable.';
   return saveAndReturn(doc.id, question, {
     answer: summary,
     isGrounded: true,

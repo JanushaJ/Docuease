@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createCanvas } from 'canvas';
 import fetch from 'node-fetch';
 

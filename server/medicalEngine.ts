@@ -247,7 +247,7 @@ export async function processUploadedFile(
     serviceConfigured: hasApiKey || ocrResult.serviceName.includes('Tesseract'),
     translations,
     get explanation(): DocumentExplanation {
-      return this.translations[this.selectedLanguage] || this.translations.en;
+      return (this.translations[this.selectedLanguage] || this.translations.en)!;
     }
   };
 

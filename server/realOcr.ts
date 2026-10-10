@@ -1544,7 +1544,7 @@ Return a strictly valid JSON object with the following schema:
     diagnoses: parsed.diagnoses || [],
     instructions: parsed.instructions || [],
     followUpInstructions: parsed.followUpInstructions || 'Not specified in the document.',
-    labValues,
+    labValues: parsed.labValues || [],
     labResults: documentClassification === 'LAB_REPORT' ? extractLabReportData(rawLines, rawLines.join('\n') || responseText).labResults : [],
     documentClassification,
     isUnreadable: tokens.length === 0,

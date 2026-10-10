@@ -160,6 +160,12 @@ export interface BillDetails {
   lateFee?: string;
   paymentInstructions?: string;
   disconnectionNotice?: string;
+  breakdown?: {
+    energyCharges?: string;
+    meterRent?: string;
+    taxes?: string;
+    [key: string]: any;
+  };
 }
 
 export interface FinancialDetails {
@@ -282,6 +288,7 @@ export interface DocumentExplanation {
   languageName?: string;
   // Three levels of comprehension:
   originalTextSummary?: string;  // Original formal/technical wording
+  originalSummary?: string;      // Compatibility alias
   simpleSummary?: string;        // Everyday clear conversational language
   explainLikeIm10?: string;      // Very simple 1st-grade language for low literacy
   
@@ -302,7 +309,7 @@ export interface DocumentExplanation {
   tokens?: any[];
   
   // Universal 7-part breakdown:
-  breakdown: WhatDoesThisMeanBreakdown;
+  breakdown?: WhatDoesThisMeanBreakdown;
   
   // Specific category payload if applicable:
   billDetails?: BillDetails;
@@ -356,6 +363,8 @@ export interface StructuredMedication {
   isVerified?: boolean;
   verificationStatus?: 'VERIFIED' | 'LIKELY' | 'UNCLEAR' | 'NO_MATCH' | 'STRENGTH_REJECTED';
   verificationMessage?: string;
+  matchedBrand?: string;
+  matchedGeneric?: string;
   confidence: number | null;
   confidenceGrade?: 'HIGH' | 'MEDIUM' | 'LOW / NEEDS VERIFICATION';
   rawLine?: string;
