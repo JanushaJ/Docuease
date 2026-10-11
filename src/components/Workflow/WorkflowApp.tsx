@@ -136,10 +136,15 @@ export const WorkflowApp: React.FC<WorkflowAppProps> = ({
       setAnalysisProgress(95);
 
       if (!response.ok) {
-        throw new Error(`Analysis request returned status ${response.status}`);
+        const errorPayload = await response.json().catch(() => ({}));
+        throw new Error(errorPayload.error || `Analysis request returned status ${response.status}`);
       }
 
       const result = await response.json();
+      if (!result.success || !result.data) {
+        throw new Error(result.error || 'Failed to extract document contents accurately.');
+      }
+
       setAnalysisResult(result);
       setAnalysisProgress(100);
 
@@ -149,71 +154,12 @@ export const WorkflowApp: React.FC<WorkflowAppProps> = ({
       }, 400);
 
     } catch (err: any) {
-      console.warn('[WorkflowApp analysis network issue, activating client-side zero-rejection fallback]:', err);
-      // Zero-Rejection Safe Fallback: Never reject or halt on error
-      const isPrescription = selectedCategory === 'prescription';
-      const fallbackScript = isPrescription
-        ? 'Hello! I am Krish, your 3D document assistant. I have reviewed your handwritten doctor prescription note. The doctor has prescribed medications to be taken on schedule after food with water. Please verify any handwritten brand names with your pharmacist before taking.'
-        : 'Hello! I am Krish, your 3D document assistant. I have reviewed your document. The key dates, required steps, and important instructions have been extracted for your convenience.';
-
-      const fallbackResult = {
-        success: true,
-        analysisType: isPrescription ? 'medical' : 'utility_or_notice',
-        data: isPrescription ? {
-          tool: 'MedScan AI',
-          documentSubtype: 'PRESCRIPTION',
-          identifiedCondition: 'Doctor Consultation & Clinical Prescription',
-          patientName: 'Patient Record',
-          doctorOrLabName: 'Clinical Healthcare Practice',
-          date: new Date().toLocaleDateString('en-GB'),
-          medications: [
-            {
-              name: 'Prescribed Clinical Medication (Handwritten Doctor Order)',
-              strength: 'Standard therapeutic dose',
-              dosage: '1-0-1 (Twice daily)',
-              frequency: 'Morning & Night (Twice daily after meals)',
-              duration: '5 days',
-              timingInstructions: 'Take with water after food (PC)',
-              isLegible: true,
-              needsPharmacistVerification: true,
-              notes: 'Confirm exact handwritten brand formulation with your pharmacist'
-            }
-          ],
-          labBiomarkers: [],
-          hasIllegibleText: false,
-          unclearItemsNotes: [],
-          clinicalSummary: 'Handwritten prescription notes deciphered. Clinical directions indicate scheduled oral medication intake with food.',
-          simpleExplanation: 'This is your doctor prescription note. Take your medicines as scheduled after food with water. Always verify handwritten brand names with your pharmacist.',
-          actionItems: [
-            'Present this prescription to your registered pharmacist for dispensing',
-            'Take each dose on time as directed by your physician',
-            'Drink plenty of water and complete the full prescribed course'
-          ],
-          spokenExplanation: fallbackScript,
-          translatedLanguage: targetLang
-        } : {
-          tool: 'DocuSimplify AI',
-          documentSubtype: 'OFFICIAL_DOCUMENT',
-          providerOrIssuer: 'Official Service Provider',
-          accountNumber: '884920311',
-          billingPeriod: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-          totalAmountDue: '₹742.00',
-          dueDate: '15 Oct 2026',
-          breakdownOfFees: [{ description: 'Main Tariff Charges', amount: '₹742.00' }],
-          requiredActions: ['Review statement details and complete actions before due date'],
-          summary: 'Official document reviewed. Key dates and instructions summarized.',
-          simpleExplanation: 'This document has been reviewed. Follow the required steps to complete your actions on time.',
-          spokenExplanation: fallbackScript,
-          translatedLanguage: targetLang
-        }
-      };
-
-      setAnalysisResult(fallbackResult);
-      setAnalysisProgress(100);
-      setTimeout(() => {
-        setIsAnalyzing(false);
-        setCurrentStep('results');
-      }, 500);
+      console.error('[WorkflowApp analysis error]:', err);
+      setIsAnalyzing(false);
+      setAnalysisProgress(0);
+      setAnalysisError(
+        err?.message || 'Document analysis could not be completed. Please ensure the uploaded image or document is clear and readable.'
+      );
     }
   };
 
@@ -340,41 +286,87 @@ export const WorkflowApp: React.FC<WorkflowAppProps> = ({
         />
       )}
 
-      {/* Screen: Animated 3D Cartoon Avatar Analyzing Progress State */}
+      {/* Screen: Animated 3D Cartoon Avatar Analyzing Progress State OR Actionable Error */}
       {currentStep === 'analyzing' && (
         <div className="w-full max-w-md mx-auto my-auto py-8 px-4 sm:px-6 text-center space-y-4 animate-in fade-in">
-          {/* 3D Avatar Cartoon in Thinking Mode */}
-          <div className="w-full max-w-[260px] mx-auto rounded-3xl overflow-hidden border border-teal-200/80 bg-gradient-to-b from-teal-50/60 to-white shadow-lg p-1">
-            <KrishXTattvaAvatar
-              mood="thinking"
-              isSpeaking={false}
-              compact={true}
-              showControls={false}
-              language={selectedLanguage}
-              characterTitle="DocuEase 3D Assistant"
-            />
-          </div>
+          {analysisError ? (
+            <div className="bg-white rounded-3xl p-6 border border-rose-200 shadow-xl space-y-4 text-left">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold shrink-0 text-lg">
+                  ⚠️
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-slate-900">
+                    Analysis Incomplete
+                  </h3>
+                  <p className="text-xs text-rose-600 font-medium">
+                    Evidence Verification Halt
+                  </p>
+                </div>
+              </div>
 
-          <div className="space-y-1">
-            <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">
-              Analyzing Your Document
-            </h3>
-            <p className="text-xs sm:text-sm text-teal-800 font-bold">
-              {analysisStatusText}
-            </p>
-          </div>
+              <div className="p-3.5 bg-rose-50/80 rounded-2xl border border-rose-100 text-xs sm:text-sm text-slate-800 leading-relaxed font-sans">
+                {analysisError}
+              </div>
 
-          {/* Progress Bar */}
-          <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden shadow-inner">
-            <div
-              className="bg-gradient-to-r from-teal-600 to-emerald-500 h-2.5 rounded-full transition-all duration-300"
-              style={{ width: `${analysisProgress}%` }}
-            />
-          </div>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                <strong className="text-slate-700">Safety Notice:</strong> DocuEase never fabricates or guesses unreadable medicine names, dosages, or food instructions. Please ensure your photo is well-lit, sharp, and shows all text clearly.
+              </p>
 
-          <p className="text-[11px] text-slate-500 font-medium">
-            3D Assistant is deciphering clinical handwriting & applying multi-language translation
-          </p>
+              <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                <button
+                  onClick={() => handleGenerateExplanation()}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md transition-all text-center cursor-pointer"
+                >
+                  Retry Analysis
+                </button>
+                <button
+                  onClick={() => {
+                    setAnalysisError(null);
+                    setCurrentStep('upload');
+                  }}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all text-center cursor-pointer"
+                >
+                  Upload Clearer Photo
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* 3D Avatar Cartoon in Thinking Mode */}
+              <div className="w-full max-w-[260px] mx-auto rounded-3xl overflow-hidden border border-teal-200/80 bg-gradient-to-b from-teal-50/60 to-white shadow-lg p-1">
+                <KrishXTattvaAvatar
+                  mood="thinking"
+                  isSpeaking={false}
+                  compact={true}
+                  showControls={false}
+                  language={selectedLanguage}
+                  characterTitle="DocuEase 3D Assistant"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                  Analyzing Your Document
+                </h3>
+                <p className="text-xs sm:text-sm text-teal-800 font-bold">
+                  {analysisStatusText}
+                </p>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden shadow-inner">
+                <div
+                  className="bg-gradient-to-r from-teal-600 to-emerald-500 h-2.5 rounded-full transition-all duration-300"
+                  style={{ width: `${analysisProgress}%` }}
+                />
+              </div>
+
+              <p className="text-[11px] text-slate-500 font-medium">
+                3D Assistant is deciphering optical strokes & applying multi-language translation
+              </p>
+            </>
+          )}
         </div>
       )}
 

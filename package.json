@@ -10,7 +10,7 @@
     "server": "tsx watch server/index.ts",
     "client": "vite",
     "build": "tsc && vite build",
-    "test": "tsx tests/docuease.test.ts && tsx tests/krishxtattva.test.ts && tsx tests/hepatitis_zero_fake.test.ts && tsx tests/api_analyze.test.ts",
+    "test": "tsx tests/docuease.test.ts && tsx tests/krishxtattva.test.ts && tsx tests/hepatitis_zero_fake.test.ts && tsx tests/api_analyze.test.ts && tsx tests/master_pipeline.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -58,111 +58,125 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Zero-Rejection Resilient Local Fallback
+    // Grounded Local Parser when Gemini is unavailable or documentText is passed
     const isLab = /lab|report|hepatitis|hbsag|blood|serology|pathology|biomarker|s\/co|sample|cmia/i.test(fileName || '') ||
                   /hepatitis|hbsag|non-reactive|reactive|s\/co|metropolis|cmia|chemiluminescent|antigen|anti-hcv|bilirubin/i.test(effectiveText);
-    const isMedical = tool === 'medscan' || isLab || /prescription|med|dr|patient|doctor|rx/i.test(fileName || '');
+    const isPrescription = !isLab && (tool === 'medscan' || /prescription|med|dr|patient|doctor|rx/i.test(fileName || '') || /rx|tab|cap|dose|doctor|patient|take/i.test(effectiveText));
+    const isMedical = isLab || isPrescription;
 
     let fallbackScript = '';
     let fallbackData: any = null;
 
     if (isLab) {
       const scoMatch = effectiveText.match(/(\d+\.\d+)\s*(?:s\/co|index)?/i);
-      const observedValue = scoMatch ? scoMatch[1] : '0.35';
+      const observedValue = scoMatch ? scoMatch[1] : 'Recorded on report';
       const isNonReactive = !/reactive\b(?!.*non)/i.test(effectiveText) || /non[\s-]*reactive|negative/i.test(effectiveText);
 
-      // Check for patient / doctor in text
       const patientMatch = effectiveText.match(/(?:patient|name|mr|mrs|ms)[:.\s]+([A-Za-z\s]{3,25})/i);
-      const patientName = patientMatch ? patientMatch[1].trim() : 'Mr. Rajeev Verma';
+      const patientName = patientMatch ? patientMatch[1].trim() : undefined;
       const labMatch = effectiveText.match(/(?:lab|laboratory|healthcare|center|hospital)[:.\s]+([A-Za-z\s]{3,30})/i);
-      const labName = labMatch ? labMatch[1].trim() : 'Metropolis Healthcare Diagnostic Laboratory';
+      const labName = labMatch ? labMatch[1].trim() : undefined;
 
-      fallbackScript = `Hello! I am Dr. Krish, your document doctor. I have analyzed your Hepatitis laboratory report. Your Hepatitis B surface antigen test result is ${observedValue} S/CO, which is Non-Reactive and Negative. This confirms that there is no active Hepatitis B infection detected in your blood. No prescription medicines are needed for this test.`;
+      fallbackScript = `Hello! I am Dr. Krish, your document doctor. I have reviewed your laboratory test report. The extracted findings record ${observedValue} S/CO. Zero medications are prescribed on diagnostic laboratory sheets. Please consult your physician.`;
 
       fallbackData = {
         tool: 'MedScan AI' as const,
         documentSubtype: 'LAB_REPORT' as const,
-        identifiedCondition: 'Hepatitis B Surface Antigen (HBsAg) Serology Panel',
+        identifiedCondition: 'Diagnostic Laboratory Panel',
         patientName,
         doctorOrLabName: labName,
         date: new Date().toLocaleDateString('en-GB'),
         medications: [], // ZERO FAKE MEDS
         labBiomarkers: [
           {
-            biomarker: 'HBsAg (Hepatitis B Surface Antigen)',
+            biomarker: 'Reported Diagnostic Biomarker',
             value: observedValue,
             unit: 'S/CO',
-            referenceRange: '< 0.90 S/CO (Non-Reactive)',
+            referenceRange: 'As stated on laboratory report',
             classification: isNonReactive ? 'Normal' : 'Elevated',
             clinicalNote: isNonReactive 
-              ? 'NON-REACTIVE / Negative. No active Hepatitis B virus detected.'
-              : 'REACTIVE. Active infection or exposure detected.'
+              ? 'Non-Reactive / Negative. No viral presence detected.'
+              : 'Reactive finding detected on report.'
           }
         ],
         hasIllegibleText: false,
         unclearItemsNotes: [],
-        clinicalSummary: `Serum sample analyzed via Chemiluminescent Microparticle Immunoassay (CMIA). HBsAg result: ${observedValue} S/CO (Cutoff threshold: < 0.90 S/CO). Result: ${isNonReactive ? 'NON-REACTIVE (Negative)' : 'REACTIVE'}. No active Hepatitis B infection detected.`,
-        simpleExplanation: `This is your official laboratory blood test report for Hepatitis B Surface Antigen (HBsAg). Your result is ${observedValue} S/CO, which is Non-Reactive (Negative) because it is below the 0.90 cutoff. This means there is NO active Hepatitis B virus in your blood. The result is completely normal and healthy.`,
+        clinicalSummary: `Laboratory report reviewed. Result value: ${observedValue}. Diagnostic findings indicate ${isNonReactive ? 'Non-Reactive / Negative' : 'Reactive'} test status.`,
+        simpleExplanation: `This is your official laboratory report. Your extracted result is ${observedValue}. No prescription medicines are needed for this test.`,
         actionItems: [
-          'Result is Non-Reactive (Negative) — no active Hepatitis B infection detected',
+          'Review these laboratory findings with your doctor during routine checkup',
           'Zero medications required for this diagnostic test',
-          'If you received the Hepatitis B vaccine, Non-Reactive is the expected healthy result',
-          'Consult your doctor for routine annual wellness checkups'
+          'Retain physical lab document for medical records'
         ],
         spokenExplanation: fallbackScript,
         translatedLanguage: chosenLang
       };
-    } else if (isMedical) {
-      fallbackScript = 'Hello! I am Dr. Krish, your document doctor. I have reviewed your medical prescription notes. The doctor clinical orders and scheduled doses have been organized. Please verify any handwritten brand names with your pharmacist before taking.';
+    } else if (isPrescription) {
+      // Check if text has any readable medications or if it is unreadable
+      const rxMatch = effectiveText.match(/\b([A-Za-z]{3,20})\s+(\d+(?:\.\d+)?\s*(?:mg|ml|mcg|gm|iu|tablets?|caps?))\b/i);
+      const hasAC = /\b(ac|ante\s*cibum|before\s*(?:food|meals?))\b/i.test(effectiveText);
+      const hasPC = /\b(pc|post\s*cibum|after\s*(?:food|meals?))\b/i.test(effectiveText);
+      const timing = hasAC ? 'Before meals (AC)' : hasPC ? 'After meals (PC)' : 'As directed by physician';
+
+      const medications = rxMatch ? [
+        {
+          name: rxMatch[1],
+          strength: rxMatch[2],
+          dosage: 'As prescribed',
+          frequency: 'As advised',
+          duration: 'As advised',
+          timingInstructions: timing,
+          isLegible: true,
+          needsPharmacistVerification: false,
+          notes: hasAC ? 'Take before food (AC)' : hasPC ? 'Take after food (PC)' : undefined
+        }
+      ] : [];
+
+      const hasMeds = medications.length > 0;
+      fallbackScript = hasMeds
+        ? `Hello! I am Dr. Krish, your document doctor. I have reviewed your prescription note. The doctor has prescribed ${medications[0].name} ${medications[0].strength}. Please verify all handwritten brand names with your pharmacist.`
+        : 'Hello! I am Dr. Krish, your document assistant. The handwriting on this prescription could not be deciphered with high certainty. Please consult your pharmacist or prescribing doctor to verify the medicine details.';
+
       fallbackData = {
         tool: 'MedScan AI' as const,
         documentSubtype: 'PRESCRIPTION' as const,
-        identifiedCondition: 'Doctor Consultation & Clinical Prescription',
-        patientName: 'Patient Record',
-        doctorOrLabName: 'Medical Practice & Consultation Clinic',
+        identifiedCondition: 'Doctor Clinical Prescription',
+        patientName: undefined,
+        doctorOrLabName: undefined,
         date: new Date().toLocaleDateString('en-GB'),
-        medications: [
-          {
-            name: 'Handwritten Clinical Medication 1',
-            strength: 'Standard therapeutic dose',
-            dosage: '1-0-1 (Twice daily)',
-            frequency: 'Morning & Night',
-            duration: '5 days',
-            timingInstructions: 'Take with water after food (PC)',
-            isLegible: true,
-            needsPharmacistVerification: true,
-            notes: 'Confirm exact handwritten brand formulation with your pharmacist'
-          }
-        ],
+        medications,
         labBiomarkers: [],
-        hasIllegibleText: false,
-        unclearItemsNotes: ['Handwritten doctor prescription orders verified with scheduled dosage patterns'],
-        clinicalSummary: 'Handwritten prescription notes deciphered. Clinical directions indicate scheduled oral medication intake with food.',
-        simpleExplanation: 'This is your doctor prescription note. Take your medicines as scheduled after food with water. Always double-check handwritten brand names with your pharmacist.',
+        hasIllegibleText: !hasMeds,
+        unclearItemsNotes: !hasMeds ? ['Handwritten doctor prescription orders could not be read clearly — please confirm with your pharmacist.'] : [],
+        clinicalSummary: hasMeds 
+          ? `Clinical prescription notes deciphered. Prescribed medication: ${medications[0].name}.`
+          : 'Prescription handwriting is ambiguous or unreadable. Pharmacist verification required.',
+        simpleExplanation: hasMeds 
+          ? `This is your doctor prescription note for ${medications[0].name}. Take as scheduled and verify brand names with your pharmacist.`
+          : 'Unable to read clearly — please confirm with your pharmacist or prescribing clinician.',
         actionItems: [
           'Present this prescription to your registered pharmacist for dispensing',
-          'Take each dose on time as directed by your physician',
-          'Drink plenty of water and complete the full prescribed course'
+          'Do not guess dosages or start unverified medications',
+          'Consult prescribing physician if any question remains'
         ],
         spokenExplanation: fallbackScript,
         translatedLanguage: chosenLang
       };
     } else {
-      fallbackScript = 'Hello! I am Dr. Krish, your document guide. I have reviewed your document. The key dates, required steps, and important instructions have been extracted for your convenience.';
+      // General or utility document
+      fallbackScript = 'Hello! I am Dr. Krish, your document guide. I have reviewed your document. The key dates and instructions have been summarized for your convenience.';
       fallbackData = {
         tool: 'DocuSimplify AI' as const,
-        documentSubtype: 'ELECTRICITY_BILL' as const,
-        providerOrIssuer: 'Official Service Provider',
-        accountNumber: '884920311',
-        billingPeriod: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-        totalAmountDue: '₹742.00',
-        dueDate: '15 Oct 2026',
-        lateFeeNotice: 'Late payment surcharge applies after due date',
-        breakdownOfFees: [
-          { description: 'Current Tariff Charges', amount: '₹742.00' }
-        ],
-        requiredActions: ['Review statement details and complete actions before due date'],
-        summary: 'Official document reviewed. Key dates and charges summarized.',
+        documentSubtype: 'OFFICIAL_DOCUMENT' as const,
+        providerOrIssuer: 'Official Issuer',
+        accountNumber: undefined,
+        billingPeriod: undefined,
+        totalAmountDue: undefined,
+        dueDate: undefined,
+        lateFeeNotice: undefined,
+        breakdownOfFees: [],
+        requiredActions: ['Review document contents and complete any stated actions before the deadline'],
+        summary: 'Official document reviewed. Key dates and instructions summarized.',
         simpleExplanation: 'This document has been reviewed. Follow the required steps to complete your actions on time.',
         spokenExplanation: fallbackScript,
         translatedLanguage: chosenLang
@@ -177,7 +191,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      engine: 'DocuEase AI Zero-Rejection Pipeline',
+      engine: 'DocuEase AI Grounded Optical Pipeline',
       analysisType: isMedical ? 'medical' : 'utility_or_notice',
       data: fallbackData,
       sentenceTimings: fallbackSentenceTimings,

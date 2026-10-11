@@ -474,14 +474,14 @@ app.post('/api/analyze', async (req, res) => {
       const medications = isLab ? [] : parsedData.structuredMeds.map(m => ({
         name: m.name,
         strength: m.strength || undefined,
-        dosage: m.dosage || '1-0-1',
-        frequency: m.frequency || 'Twice daily',
-        duration: m.duration || '5 days',
-        timingInstructions: m.timingInstructions || 'After food',
+        dosage: m.dosage || 'As prescribed',
+        frequency: m.frequency || 'As advised',
+        duration: m.duration || 'As directed',
+        timingInstructions: m.timingInstructions || 'As directed by physician',
         isLegible: m.isVerified,
         needsPharmacistVerification: !m.isVerified || (m.confidence !== null && m.confidence < 70),
         originalText: m.rawLine || m.name,
-        notes: !m.isVerified ? 'Needs Pharmacist Verification' : undefined
+        notes: m.foodInstructions || (!m.isVerified ? 'Needs Pharmacist Verification' : undefined)
       }));
 
       const hasIllegibleText = medications.some(m => m.needsPharmacistVerification);
@@ -523,22 +523,22 @@ app.post('/api/analyze', async (req, res) => {
     const fin = parsedData.financialDetails;
 
     const breakdownOfFees = bill?.breakdown ? [
-      { description: 'Current Tariff Charges', amount: bill.breakdown.energyCharges || bill.amountDue || '₹0.00' },
+      { description: 'Current Tariff Charges', amount: bill.breakdown.energyCharges || bill.amountDue || 'Refer to statement' },
       bill.breakdown.meterRent ? { description: 'Meter Rent', amount: bill.breakdown.meterRent } : null,
       bill.breakdown.taxes ? { description: 'Taxes & Cess', amount: bill.breakdown.taxes } : null,
     ].filter(Boolean) as any[] : [
-      { description: 'Total Amount Payable', amount: bill?.amountDue || fin?.amountMentioned || '₹742.00' }
+      { description: 'Total Amount Payable', amount: bill?.amountDue || fin?.amountMentioned || 'Refer to statement' }
     ];
 
     const docuSimplifyData = {
       tool: 'DocuSimplify AI' as const,
       documentSubtype: parsedData.classification as any,
       providerOrIssuer: bill?.provider || fin?.institutionName || parsedData.detectedCategoryLabel,
-      accountNumber: bill?.accountNumber || fin?.accountRef || 'Not Specified',
-      billingPeriod: bill?.billingPeriod || new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-      totalAmountDue: bill?.amountDue || fin?.amountMentioned || '₹742.00',
-      dueDate: bill?.dueDate || fin?.deadline || activeTranslation.breakdown?.deadline || '15 Oct 2026',
-      lateFeeNotice: bill?.lateFee || 'Late payment surcharge applies after due date',
+      accountNumber: bill?.consumerNumber || fin?.accountNumberMasked || 'Not Specified',
+      billingPeriod: bill?.billingPeriod || 'Current Billing Cycle',
+      totalAmountDue: bill?.amountDue || fin?.amountMentioned || 'Refer to statement',
+      dueDate: bill?.dueDate || fin?.deadline || activeTranslation.breakdown?.deadline || 'Refer to statement',
+      lateFeeNotice: bill?.disconnectionNotice || 'Late payment surcharge applies after due date',
       breakdownOfFees,
       requiredActions: [activeTranslation.breakdown?.whatToDo || 'Review document details'],
       fraudCautionNotice: fin ? 'Mandatory Anti-Fraud Notice: Never share OTP, CVV, or passwords with anyone.' : undefined,
@@ -560,30 +560,44 @@ app.post('/api/analyze', async (req, res) => {
 
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error('[API /analyze ERROR, activating graceful zero-rejection fallback]:', msg);
-    const chosenLang = ((req.body?.targetLanguage || req.body?.language || 'en') as SupportedLanguage);
-    const fallbackScript = 'Document analyzed successfully. Your document has been processed and translated into your selected language.';
-    return res.json({
-      success: true,
-      engine: 'Krishxtattva Zero-Rejection Safe Fallback Engine',
-      analysisType: 'medical',
-      data: {
-        tool: 'MedScan AI',
-        documentSubtype: 'PRESCRIPTION',
-        clinicalSummary: 'Document reviewed. Clinical handwriting and scheduled guidance processed.',
-        simpleExplanation: 'This document has been reviewed. Follow the schedule and consult your pharmacist for dosage confirmations.',
-        spokenExplanation: fallbackScript,
-        medications: [],
-        labBiomarkers: [],
-        actionItems: ['Consult your pharmacist or healthcare provider', 'Keep the physical document safely'],
-        hasIllegibleText: false,
-        unclearItemsNotes: [],
-        translatedLanguage: chosenLang
-      },
-      sentenceTimings: [{ sentence: fallbackScript, durationSec: 3.5, audioStartTime: 0, audioEndTime: 3.5 }],
-      spokenScript: fallbackScript,
-      language: chosenLang
+    console.error('[API /analyze ERROR]:', msg);
+    return res.status(500).json({
+      error: `Analysis failed: ${msg}. Please ensure your document image is clear, well-lit, and try again.`
     });
+  }
+});
+
+// ============================================================
+// /api/tts — Native Multilingual Speech Streaming Proxy
+// Supports: te (Telugu), ta (Tamil), hi (Hindi), kn, ml, bn, mr, gu, pa, ur, en
+// ============================================================
+app.get('/api/tts', async (req, res) => {
+  try {
+    const text = typeof req.query.text === 'string' ? req.query.text.trim().slice(0, 300) : '';
+    const lang = typeof req.query.lang === 'string' ? req.query.lang.trim() : 'en';
+
+    if (!text) {
+      return res.status(400).json({ error: 'Text query parameter is required' });
+    }
+
+    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${encodeURIComponent(lang)}&q=${encodeURIComponent(text)}`;
+    const response = await fetch(ttsUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
+
+    if (!response.ok) {
+      return res.status(response.status).json({ error: 'TTS upstream returned error' });
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    res.setHeader('Content-Type', 'audio/mpeg');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.send(Buffer.from(audioBuffer));
+  } catch (err: any) {
+    console.error('[/api/tts proxy error]:', err?.message || err);
+    res.status(500).json({ error: 'Failed to generate TTS audio stream' });
   }
 });
 

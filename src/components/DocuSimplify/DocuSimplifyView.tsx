@@ -242,17 +242,11 @@ export const DocuSimplifyView: React.FC<DocuSimplifyViewProps> = ({
           currentLanguage,
           textContent
         );
-      } catch (err) {
-        console.warn('Backend fallback notice:', err);
-        // Fallback to electricity bill demo or default
-        const fallbackDemo = DEMO_DOCUMENTS[0] || ({} as ProcessedDocument);
-        resDoc = {
-          ...fallbackDemo,
-          id: `doc-${Date.now()}`,
-          name: file?.name || 'Uploaded Document',
-          uploadedAt: new Date().toISOString(),
-          selectedLanguage: currentLanguage,
-        };
+      } catch (err: any) {
+        console.error('DocuSimplify direct processing error:', err);
+        setFileError(err?.message || 'Document processing could not be completed. Please ensure the document is clear, legible, and uncorrupted.');
+        setStep('upload');
+        return;
       }
 
       setProcessingProgress(100);

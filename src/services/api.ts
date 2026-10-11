@@ -73,27 +73,16 @@ export async function runOcrApi(
   imageDataUrl: string,
   uploadId?: string
 ): Promise<{ rawText: string; tokens: OCRToken[]; serviceName: string; confidenceInfo: ConfidenceInfo }> {
-  try {
-    const res = await fetch(`${API_BASE}/ocr`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageDataUrl, uploadId })
-    });
-    if (res.ok) return await res.json();
-  } catch (err) {
-    console.warn('[runOcrApi fallback]:', err);
+  const res = await fetch(`${API_BASE}/ocr`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ imageDataUrl, uploadId })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `OCR recognition failed with status ${res.status}`);
   }
-  return {
-    rawText: 'Document text extracted and verified.',
-    tokens: [{ id: 'tok-1', text: 'Document information verified', confidence: 95, bbox: { x: 10, y: 10, width: 80, height: 10 }, category: 'general', isUncertain: false }],
-    serviceName: 'Krishxtattva Optical Stroke & Multimodal Recognition Engine',
-    confidenceInfo: {
-      serviceName: 'Krishxtattva Optical Engine',
-      hasNumericalConfidence: true,
-      averageConfidenceScore: 0.95,
-      providerNotice: 'Optical text & stroke confidence calculated successfully.'
-    }
-  };
+  return await res.json();
 }
 
 /**
@@ -110,28 +99,16 @@ export async function extractMedicalInfoApi(
   symptoms: string[]; 
   separatedContent: SeparatedClinicalContent 
 }> {
-  try {
-    const res = await fetch(`${API_BASE}/extract`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageDataUrl, uploadId })
-    });
-    if (res.ok) return await res.json();
-  } catch (err) {
-    console.warn('[extractMedicalInfoApi fallback]:', err);
+  const res = await fetch(`${API_BASE}/extract`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ imageDataUrl, uploadId })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `Medical extraction failed with status ${res.status}`);
   }
-  return {
-    structuredMeds: [],
-    diagnoses: [],
-    instructions: ['Take medication as directed by healthcare provider.'],
-    labValues: [],
-    symptoms: [],
-    separatedContent: {
-      documentSays: [{ category: 'Extraction', field: 'Document Status', value: 'Content extracted and verified.' }],
-      termMeanings: [],
-      notDetermined: []
-    }
-  };
+  return await res.json();
 }
 
 /**
@@ -141,28 +118,16 @@ export async function verifyMedicalInfoApi(
   imageDataUrl: string,
   uploadId?: string
 ): Promise<{ safety: any; uncertainWords: any[]; allVerified: boolean }> {
-  try {
-    const res = await fetch(`${API_BASE}/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageDataUrl, uploadId })
-    });
-    if (res.ok) return await res.json();
-  } catch (err) {
-    console.warn('[verifyMedicalInfoApi fallback]:', err);
+  const res = await fetch(`${API_BASE}/verify`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ imageDataUrl, uploadId })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `Medical safety verification failed with status ${res.status}`);
   }
-  return {
-    safety: {
-      passed: true,
-      timestamp: new Date().toISOString(),
-      checks: [
-        { id: 'chk-1', name: 'Anti-Hallucination Guard', passed: true, details: 'Strictly grounded in extracted handwriting.' },
-        { id: 'chk-2', name: 'Deterministic Safety Audit', passed: true, details: 'Deterministic safety rules verified.' }
-      ]
-    },
-    uncertainWords: [],
-    allVerified: true
-  };
+  return await res.json();
 }
 
 /**
@@ -173,31 +138,16 @@ export async function generateExplanationApi(
   language: SupportedLanguage = 'en',
   uploadId?: string
 ): Promise<{ explanation: any }> {
-  try {
-    const res = await fetch(`${API_BASE}/explain`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageDataUrl, language, uploadId })
-    });
-    if (res.ok) return await res.json();
-  } catch (err) {
-    console.warn('[generateExplanationApi fallback]:', err);
+  const res = await fetch(`${API_BASE}/explain`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ imageDataUrl, language, uploadId })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `Explanation generation failed with status ${res.status}`);
   }
-  return {
-    explanation: {
-      language,
-      languageName: 'English',
-      simpleSummary: 'Document analyzed and explained in plain language.',
-      explainLikeIm10: 'Here is what your document says in simple terms.',
-      spokenScript: 'Hello, I have analyzed your document and verified the information.',
-      whatWasWritten: [],
-      whatMedicalTermsMean: [],
-      whatDocumentSaysHappened: [],
-      whatIsUnclear: [],
-      whatToAskDoctor: [],
-      sentenceTimings: []
-    }
-  };
+  return await res.json();
 }
 
 /**

@@ -214,17 +214,11 @@ export const MedScanView: React.FC<MedScanViewProps> = ({
           'prescription',
           currentLanguage
         );
-      } catch (err) {
-        console.warn('[Backend process notice, using verified clinical engine]:', err);
-        const demo = getPrescriptionDemoDocument();
-        resultDoc = {
-          ...demo,
-          id: `med-${Date.now()}`,
-          name: file?.name || 'Prescription Document',
-          imageDataUrl: dataUrl,
-          uploadedAt: new Date().toISOString(),
-          selectedLanguage: currentLanguage,
-        };
+      } catch (err: any) {
+        console.error('MedScan direct processing error:', err);
+        setFileError(err?.message || 'Prescription analysis could not be completed. Please ensure the prescription photo is clear, well-lit, and legible.');
+        setStep('upload');
+        return;
       }
 
       setProcessingProgress(100);
